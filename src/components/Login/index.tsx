@@ -51,7 +51,7 @@ const Login = () => {
   };
 
   const goToGoogle = async () => {
-    window.location.replace(`http://localhost:3000/auth/google`);
+    window.location.replace(`${import.meta.env.VITE_ENDPOINT_URL}/auth/google`);
   };
 
   return (
