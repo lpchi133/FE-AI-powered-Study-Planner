@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
+import GoogleUser from "./components/GoogleUser";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/google/user/:token" element={<GoogleUser />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<Profile />} />

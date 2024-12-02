@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { useAuth } from './useAuth';
-import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { useAuth } from "./useAuth";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const useAxios = () => {
@@ -8,7 +8,7 @@ const useAxios = () => {
   const navigate = useNavigate();
 
   const instance = axios.create({
-    baseURL: 'https://be-ai-powered-study-planner.vercel.app',
+    baseURL: import.meta.env.VITE_ENDPOINT_URL,
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -21,7 +21,7 @@ const useAxios = () => {
       if (error.response?.status === 401) {
         logout(); // Token expires then logout
         toast.error("Your session has expired. Please log in again.");
-        navigate('/login');
+        navigate("/login");
       }
       return Promise.reject(error);
     }

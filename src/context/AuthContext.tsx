@@ -11,7 +11,6 @@ interface User {
 }
 
 interface AuthContextType {
-  isAuthenticated: boolean;
   accessToken: string | null;
   user: User | null;
   login: (token: string) => void;
@@ -34,13 +33,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (accessToken) {
       try {
         const response = await axios.get(
-          "https://be-ai-powered-study-planner.vercel.app/users/profile",
+          `${import.meta.env.VITE_ENDPOINT_URL}/users/profile`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           }
         );
+        console.log("response ", response);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -54,6 +54,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // When accessToken changes, fetch user profile
   useEffect(() => {
+    console.log("accesstoken", accessToken);
     if (accessToken) {
       fetchProfile();
     } else {
@@ -72,12 +73,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("accessToken");
   };
 
-  const isAuthenticated = !!accessToken;
-
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated,
         accessToken,
         user,
         login,

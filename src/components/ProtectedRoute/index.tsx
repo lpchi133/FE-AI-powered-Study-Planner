@@ -2,14 +2,15 @@ import { useAuth } from "../../hooks/useAuth";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAuth(); 
+  const { user, logout } = useAuth();
 
-// If not logged in, redirect to login page
-  if (!isAuthenticated) {
+  // If not logged in, redirect to login page
+  if (!user) {
+    logout();
     return <Navigate to="/login" />;
   }
 
-// If logged in, display the route content
+  // If logged in, display the route content
   return <Outlet />;
 };
 
