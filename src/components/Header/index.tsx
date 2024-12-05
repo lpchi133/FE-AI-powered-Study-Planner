@@ -1,13 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';  
+import { useState } from 'react';
 
 export default function Header() {
   const { user, logout } = useAuth();  
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
   };
 
   return (
@@ -18,20 +24,53 @@ export default function Header() {
         </div>
 
         {/* Menu */}
-        <div className="space-x-4">
+        <div className="space-x-4 relative">
           {/* If the user is logged in */}
           {user ? (
-            <div className="flex items-center">
-              <span className="text-white mr-12">Welcome, {user.name}!</span>
+            <div className="flex items-center relative">
+              <span className="text-white mr-2">Welcome, {user.name}!</span>
+              <img
+                src={user.profilePicture || '/images/avt.jpg'} // Replace with the path to your default profile picture
+                alt="Profile"
+                className="w-8 h-8 rounded-full cursor-pointer"
+                onClick={toggleMenu}
+              />
+              {menuOpen && (
+                <div
+                  className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-20"
+                  style={{ marginTop: '11.4rem' }}
+                >
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Update Full Name
+                  </Link>
+                  <hr className="my-1" />
+                  <Link
+                    to="/update-profile-picture"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Update Profile Picture
+                  </Link>
+                  <hr className="my-1" />
+                  <Link
+                    to="/change-password"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Change Password
+                  </Link>
+                </div>
+              )}
               <span
                 onClick={handleLogout}
-                className="text-red-400 font-bold hover:opacity-50 transition duration-300"
+                className="text-red-400 font-bold hover:opacity-50 transition duration-300 cursor-pointer ml-4"
               >
                 Logout
               </span>
             </div>
           ) : (
-            //If the user is not logged in
+            // If the user is not logged in
             <div className="space-x-4">
               <Link
                 to="/login"
