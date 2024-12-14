@@ -17,10 +17,10 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-blue-600 p-4 shadow-md">
+    <header className="fixed top-0 left-0 w-full bg-blue-600 p-4 shadow-md z-30">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-white font-bold text-xl">
-          <Link to="/">AI-powered Study Planner</Link>
+          <Link to="/" className="text-white-important">AI-powered Study Planner</Link>
         </div>
 
         {/* Menu */}
@@ -37,7 +37,7 @@ export default function Header() {
               />
               {menuOpen && (
                 <div
-                  className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-20"
+                  className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-40"
                   style={{ marginTop: '11.4rem' }}
                 >
                   <Link

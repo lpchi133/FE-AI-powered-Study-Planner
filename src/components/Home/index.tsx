@@ -39,10 +39,16 @@ const Home = () => {
               Profile
             </button>
           </Link>
+          <Link to="/view-tasks">
+            <button className="bg-purple-500 text-white px-4 py-2 rounded">
+              View Tasks
+            </button>
+          </Link>
         </div>
       )}
     </div>
   );
 };
+
 
 export default Home;
