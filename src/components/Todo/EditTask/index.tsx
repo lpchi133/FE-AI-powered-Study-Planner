@@ -68,7 +68,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                 if (response.status === 201) {
                     this.props.updateData();
                     this.props.onHide();
-                    this.handleReset();
+                    // this.handleReset();
                     alert('Task Edited.');
                 } else {
                     alert("There was some problem with that. We're currently working on fixing it. Thank You.");
@@ -168,10 +168,13 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                                         required
                                         type="text"
                                         name="description"
-                                        placeholder="Enter the Task"
+                                        placeholder="Edit the Description"
                                         value={this.state.item.description}
                                         onChange={this.handleInputChange}
-                                        style={this.props.isDark ? dark : undefined}
+                                        style={{
+                                            ...(this.props.isDark === true ? dark : undefined),
+                                            marginBottom: '15px' // Thêm khoảng cách dưới
+                                        }}
                                     />
                                     <Form.Control.Feedback type="invalid">
                                         Please enter the task details.

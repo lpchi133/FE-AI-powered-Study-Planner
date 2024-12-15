@@ -459,7 +459,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
             </table>
           ) : (
             <div className="text-center">
-              <Image src={logo} fluid />
+              <Image className="center-image" src={logo} fluid />
               <h6 className="text-center">All done for now.<br />Click on add task to keep track of your tasks.</h6>
             </div>
           )}

@@ -210,7 +210,7 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
                                         required
                                         type="text"
                                         name="description"
-                                        placeholder="Enter The Task"
+                                        placeholder="Enter The Description"
                                         value={this.state.item.description}
                                         onChange={this.handleInputChange}
                                         style={{
