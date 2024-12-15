@@ -1,4 +1,5 @@
-import React, { ChangeEvent, FormEvent } from 'react';
+import React, { FormEvent } from 'react';
+import { ChangeEvent } from 'react';
 import './AddTask.css';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -21,10 +22,11 @@ interface AddTaskState {
 
 interface TaskItem {
     id: string;
-    // priority: string;
+    priority: string;
     description: string;
     status: string;
     label: string;
+    // start_date: string;
     date: string;
     time: string;
 }
@@ -36,10 +38,11 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
             validated: false,
             item: {
                 id: '',
-                // priority: '',
+                priority: '',
                 description: '',
                 status: '',
                 label: '',
+                // start_date: '',
                 date: '',
                 time: ''
             }
@@ -55,8 +58,10 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
     addNewTask = () => {
         const sendItem = {
             description: this.state.item.description,
+            priority: this.state.item.priority,
             status: this.state.item.status,
             label: this.state.item.label,
+            // start_date: this.state.item.start_date,
             date: this.state.item.date,
             time: this.state.item.time
         };
@@ -127,6 +132,7 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
             description: '',
             status: '',
             label: '',
+            // start_date: '',
             date: '',
             time: ''
         };
@@ -138,15 +144,14 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
         this.setValidated(false);
     };
 
-    handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const target = event.target;
-
-        const newitem = this.state.item;
         const value: string = target.value;
         const name = target.name;
-
+    
+        const newitem = { ...this.state.item };
         newitem[name as keyof TaskItem] = value;
-
+    
         this.setState({
             item: newitem
         });
@@ -186,24 +191,6 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
                             onSubmit={this.handleSubmit}
                             onReset={this.handleReset}
                         >
-                            {/* <Row>
-                                <Form.Group as={Col} md="12" controlId="validationTitle">
-                                    <Form.Control
-                                        required
-                                        type="text"
-                                        name="Title"
-                                        placeholder="Enter The Title"
-                                        value={this.state.item.priority}
-                                        onChange={this.handleInputChange}
-                                        style={{
-                                            ...(this.props.isDark === true ? dark : undefined),
-                                            marginBottom: '15px' // Thêm khoảng cách dưới
-                                        }}
-                                    />
-                                    <Form.Control.Feedback type="invalid">Please enter the task details.</Form.Control.Feedback>
-                                    <Form.Control.Feedback>Looks good.</Form.Control.Feedback>
-                                </Form.Group>
-                            </Row> */}
                             <Row>
                                 <Form.Group as={Col} md="12" controlId="validationTitle">
                                     <Form.Control
@@ -223,9 +210,31 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
                                 </Form.Group>
                             </Row>
                             <Row>
+                                <Form.Group as={Col} md="12" controlId="validationPriority">
+                                    <Form.Select
+                                        required
+                                        name="priority"
+                                        value={this.state.item.priority}
+                                        onChange={this.handleInputChange}
+                                        style={{
+                                            ...(this.props.isDark === true ? dark : undefined),
+                                            marginBottom: '15px' // Adding margin bottom
+                                        }}
+                                    >
+                                        <option value="">Select Priority</option>
+                                        <option value="HIGH">High</option>
+                                        <option value="MEDIUM">Medium</option>
+                                        <option value="LOW">Low</option>
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">Please select the priority of the task.</Form.Control.Feedback>
+                                    <Form.Control.Feedback>Looks good.</Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+
+                            <Row>
                                 <Form.Group as={Col} md="4" controlId="validationDate">
                                     <InputGroup>
-                                            <InputGroup.Text id="inputGroupPrepend">Date</InputGroup.Text>
+                                        <InputGroup.Text id="inputGroupPrepend">Date</InputGroup.Text>
                                         <Form.Control
                                             type="date"
                                             name="date"

@@ -23,10 +23,11 @@ Date.prototype.yyyymmdd = function(): string {
 
 interface TaskProps {
   id: string;
-  // priority: string;
+  priority: string;
   desc: string;
   status: string;
   label: string;
+  // start_date: string;
   date: string;
   time: string;
   comp: string;
@@ -43,11 +44,12 @@ interface TaskState {
   showEdit: boolean;
   editItem: {
     id: string;
-    // priority: string;
+    priority: string;
     description: string;
     status: string;
     label: string;
     date: string;
+    // start_date: string;
     time: string;
   };
 }
@@ -61,11 +63,12 @@ class Task extends React.Component<TaskProps, TaskState> {
       showEdit: false,
       editItem: {
         id: this.props.id,
-        // priority: this.props.priority,
+        priority: this.props.priority,
         description: this.props.desc,
         status: this.props.status,
         label: this.props.label,
         date: this.props.date,
+        // start_date: this.props.start_date,
         time: this.props.time
       }
     };
@@ -84,6 +87,10 @@ class Task extends React.Component<TaskProps, TaskState> {
     this.setState({
       checkBoxChecked: event.target.checked
     });
+
+    console.log("Checkbox clicked, value:", event.target.checked);
+    console.log("completedTask:", this.props.completedTask);
+    
     if (event.target.checked) {
       const nowDate = new Date();
       const nowTime = (nowDate.getHours() + ":" + nowDate.getMinutes()).toString();
@@ -118,9 +125,9 @@ class Task extends React.Component<TaskProps, TaskState> {
     this.props.removeItem(this.props.id);
   };
 
-  completedTask = (): void => { 
-    this.props.completedTask(this.props.id, this.props.date, this.props.time);
-  };
+  // completedTask = (): void => { 
+  //   this.props.completedTask(this.props.id, this.props.date, this.props.time);
+  // };
 
 
   toggleEditTask = (): void => {
@@ -165,13 +172,16 @@ class Task extends React.Component<TaskProps, TaskState> {
             </td>
           ) : null}
           <td className={this.props.comp === 'Archive' ? "strikeThrough" : (!this.state.checkBoxChecked ? "" : "strikeThrough")}>
-            <div>{this.props.desc}</div>
+            <div>{this.props.label}</div>
+          </td>
+          <td className={this.props.comp === 'Archive' ? "strikeThrough" : (!this.state.checkBoxChecked ? "" : "strikeThrough")}>
+            <div>{this.props.priority}</div>
           </td>
           <td className={this.props.comp === 'Archive' ? "strikeThrough" : (!this.state.checkBoxChecked ? "" : "strikeThrough")}>
             <div>{this.prettyStatus()}</div>
           </td>
           <td className={this.props.comp === 'Archive' ? "strikeThrough" : (!this.state.checkBoxChecked ? "" : "strikeThrough")}>
-            <div>{this.props.label}</div>
+            <div>{this.props.desc}</div>
           </td>
           <td className={this.props.comp === 'Archive' ? "strikeThrough" : (!this.state.checkBoxChecked ? "" : "strikeThrough")}>
             <div>{this.props.date}</div>

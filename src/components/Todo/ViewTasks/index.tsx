@@ -6,15 +6,16 @@ import Image from 'react-bootstrap/Image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import Archive from '../Archive';
-import logo from '/images/preview.png'
+import logo from '/images/preview.jpg'
 import './ViewTask.css';
 
 interface TaskItem {
     id: string;
-    // priority: string;
+    itemPriority: string;
     itemDescription: string;
     itemStatus: string;
     itemLabel: string;
+    // startDateTime: string;
     dueDateTime: string; // Giả sử định dạng là chuỗi; có thể điều chỉnh nếu cần
     authToken: string | null;
   }
@@ -22,11 +23,12 @@ interface TaskItem {
 interface TaskType {
   key: number;
   id: string;
-  // priority: string;
+  priority: string;
   description: string;
   status: string;
   label: string;
   date: string;
+  // start_date: string;
   time: string;
   authToken: string | null;
 }
@@ -37,12 +39,13 @@ interface TodoState {
   completedTodo: TaskType[];
   originalData: TaskType[];
   sortType: {
+    priority: 'asc' | 'desc' | '';
     status: 'asc' | 'desc' | '';
     label: 'asc' | 'desc' | '';
     date: 'asc' | 'desc' | '';
     time: 'asc' | 'desc' | '';
   };
-  currentSort: 'status' | 'label' | 'date' | 'time';
+  currentSort: 'priority' | 'status' | 'label' | 'date' | 'time';
   username: string;
 }
 
@@ -60,6 +63,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
     completedTodo: [],
     originalData: [],
     sortType: {
+      priority: '',
       status: '',
       label: '',
       date: 'asc',
@@ -97,7 +101,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
             const newData: TaskType = {
               key: keyId, 
               id: item.id,
-              // priority: item.priority,
+              priority: item.itemPriority,
               description: item.itemDescription,
               status: item.itemStatus,
               label: item.itemLabel,
@@ -204,6 +208,16 @@ class ViewTasks extends Component<TodoProps, TodoState> {
   
       const valueA = a[key];
       const valueB = b[key];
+
+      // Nếu key là priority, so sánh ưu tiên
+      if (key === 'priority') {
+        const priorityOrder = { 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1 };
+        const priorityA = priorityOrder[valueA as keyof typeof priorityOrder] || 0;
+        const priorityB = priorityOrder[valueB as keyof typeof priorityOrder] || 0;
+
+        // So sánh theo thứ tự ưu tiên, HIGH > MEDIUM > LOW
+        return (order === 'desc') ? priorityB - priorityA : priorityA - priorityB;
+      }
   
       // Nếu giá trị là string, sử dụng localeCompare
       if (typeof valueA === 'string' && typeof valueB === 'string') {
@@ -246,16 +260,20 @@ class ViewTasks extends Component<TodoProps, TodoState> {
 
   completedTask = (id: string, date: string, time: string) => {
     this.state.todoItems.forEach(item => {
+      
       if(id.toString().localeCompare(item.id.toString()) === 0) {
         item.status = "Completed";
         item.date = date;
-        item.time = time;
+        const formattedTime = time.padStart(5, '0');
+        item.time = formattedTime;
 
         const updateItem = {
           "id": item.id,
           "description": item.description,
+          "priority": item.priority, 
           "status": item.status,
           "label": item.label,
+          // "start_date": item.start_date,
           "date": item.date,
           "time": item.time
         }
@@ -282,7 +300,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
 
     setTimeout(() => {
       this.updateData();
-    }, 100);
+    }, 10);
   }
 
   searchFunction = (fromDate: string, toDate: string, val: number = 1) => {
@@ -307,7 +325,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
         }
       });
 
-      if(newTodo.length !== 0) {
+      if(newTodo.length >= 0) {
         this.setState({
           todoItems: newTodo,
           completedTodo: completed
@@ -330,8 +348,10 @@ class ViewTasks extends Component<TodoProps, TodoState> {
         const removeItem = {
           "id": item.id,
           "description": item.description,
+          "priority": item.priority, 
           "status": item.status,
           "label": item.label,
+          // "start_date": item.start_date,
           "date": item.date,
           "time": item.time
         }
@@ -406,19 +426,25 @@ class ViewTasks extends Component<TodoProps, TodoState> {
                 <tr className="head">
                   <th scope="col"></th>
                   <th scope="col"></th>
-                  <th scope="col">Title</th>
+                  <th onClick={() => this.sortTasks("label", true)} scope="col">
+                    <div className="sort-icon">
+                      Title
+                      {this.getSortIcon("label")}
+                    </div>
+                  </th>
+                  <th onClick={() => this.sortTasks("priority", true)} scope="col">
+                    <div className="sort-icon">
+                      Priority
+                      {this.getSortIcon("priority")}
+                    </div>
+                  </th>
                   <th onClick={() => this.sortTasks("status", true)} scope="col">
                     <div className="sort-icon">
                       Status
                       {this.getSortIcon("status")}
                     </div>
                   </th>
-                  <th onClick={() => this.sortTasks("label", true)} scope="col">
-                    <div className="sort-icon">
-                      Label
-                      {this.getSortIcon("label")}
-                    </div>
-                  </th>
+                  <th scope="col">Description</th>
                   <th onClick={() => this.sortTasks("date", true)} scope="col">
                     <div className="sort-icon">
                       Date
@@ -439,11 +465,12 @@ class ViewTasks extends Component<TodoProps, TodoState> {
                   return (
                     <Task
                       key={item.key}
-                      // priority={item.priority}
+                      priority={item.priority}
                       id={item.id}
                       desc={item.description}
                       status={item.status}
                       label={item.label}
+                      // start_date={item.start_date}
                       date={item.date}
                       time={item.time}
                       comp={""}
@@ -460,7 +487,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
           ) : (
             <div className="text-center">
               <Image className="center-image" src={logo} fluid />
-              <h6 className="text-center">All done for now.<br />Click on add task to keep track of your tasks.</h6>
+              <h6 className="text-center">All done for now or No result.<br />Click on add task or Click reset to keep track of your task .</h6>
             </div>
           )}
         </div>

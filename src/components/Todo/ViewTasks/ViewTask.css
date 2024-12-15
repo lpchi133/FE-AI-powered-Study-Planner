@@ -61,7 +61,13 @@ svg {
 .center-image {
     display: block;
     margin: 0 auto;
-  }
+    max-width: 50% !important; 
+    height: 50% !important; 
+}
+  
+thead th:not(:last-child) {
+    background-color: #c2baba6b !important; /* Màu nền xám nhạt */
+}
   
 
 @media screen and (max-width: 768px) {

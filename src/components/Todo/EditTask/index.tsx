@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChangeEvent } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -8,8 +9,10 @@ import InputGroup from 'react-bootstrap/InputGroup';
 interface Task {
     id: string;
     description: string;
+    priority: string;
     status: string;
     label: string;
+    // start_date: string;
     date: string;
     time: string;
 }
@@ -37,8 +40,10 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             item: {
                 id: this.props.editTask.id,
                 description: this.props.editTask.description,
+                priority: this.props.editTask.priority,
                 status: this.props.editTask.status,
                 label: this.props.editTask.label,
+                // start_date: this.props.editTask.start_date,
                 date: this.props.editTask.date,
                 time: this.props.editTask.time.slice(0, 5),
             },
@@ -110,8 +115,10 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             item: {
                 id: '',
                 description: '',
+                priority: '',
                 status: '',
                 label: '',
+                // start_date: '',
                 date: '',
                 time: '',
             },
@@ -119,7 +126,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
         this.setValidated(false);
     };
 
-    handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const target = event.target;
         const { name, value } = target;
 
@@ -176,6 +183,31 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                                             marginBottom: '15px' // Thêm khoảng cách dưới
                                         }}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        Please enter the task details.
+                                    </Form.Control.Feedback>
+                                    <Form.Control.Feedback>
+                                        Looks good.
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+                            <Row>
+                                <Form.Group as={Col} md="12" controlId="validationPriority">
+                                    <Form.Select
+                                        required
+                                        name="priority"
+                                        value={this.state.item.priority}
+                                        onChange={this.handleInputChange}
+                                        style={{
+                                            ...(this.props.isDark === true ? dark : undefined),
+                                            marginBottom: '15px' // Thêm khoảng cách dưới
+                                        }}
+                                    >
+                                        <option value="">Select Priority</option>
+                                        <option value="HIGH">High</option>
+                                        <option value="MEDIUM">Medium</option>
+                                        <option value="LOW">Low</option>
+                                    </Form.Select>
                                     <Form.Control.Feedback type="invalid">
                                         Please enter the task details.
                                     </Form.Control.Feedback>

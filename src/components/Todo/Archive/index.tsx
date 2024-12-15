@@ -32,9 +32,11 @@ interface ArchiveProps {
         key: number;
         id: string;
         description: string;
+        priority: string;
         status: string;
         label: string;
         date: string;
+        // start_date: string;
         time: string;
         authToken: string | null;
     }> ;
@@ -112,8 +114,9 @@ class Archive extends React.Component<ArchiveProps, ArchiveState> {
                                             <tr className="head">
                                                 <th scope="col"></th>
                                                 <th scope="col">Title</th>
+                                                <th scope="col">Priority</th>
                                                 <th scope="col">Status</th>
-                                                <th scope="col">Label</th>
+                                                <th scope="col">Description</th>
                                                 <th scope="col">Completion Date</th>
                                                 <th scope="col">Time</th>   
                                                 <th scope="col"></th>
@@ -125,6 +128,7 @@ class Archive extends React.Component<ArchiveProps, ArchiveState> {
                                                     key={item.key}
                                                     id={item.id}
                                                     desc={item.description}
+                                                    priority={item.priority}
                                                     status={item.status}
                                                     label={item.label}
                                                     date={item.date}
