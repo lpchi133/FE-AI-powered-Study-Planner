@@ -5,11 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
 import './Task.css';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-interface Date {
-  yyyymmdd(): string;
-}
-/* eslint-enable @typescript-eslint/no-unused-vars */
+// interface Date {
+//   yyyymmdd(): string;
+// }
 
 
 Date.prototype.yyyymmdd = function(): string {

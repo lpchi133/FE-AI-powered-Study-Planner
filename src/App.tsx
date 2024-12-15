@@ -14,7 +14,7 @@ import { Suspense, lazy } from 'react';
 
 
 const queryClient = new QueryClient();
-const ViewTasksWrapper = lazy(() => import('./components/ViewTasksWrapper'));
+const ViewTasksWrapper = lazy(() => import('./components/Todo/ViewTasksWrapper'));
 
 function App() {
   return (

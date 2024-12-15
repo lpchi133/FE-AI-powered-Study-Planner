@@ -6,7 +6,7 @@ import Image from 'react-bootstrap/Image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import Archive from '../Archive';
-import logo from '../../../public/images/preview.png'
+import logo from '/images/preview.png'
 import './ViewTask.css';
 
 interface TaskItem {
