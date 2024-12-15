@@ -13,8 +13,10 @@ const Profile = () => {
     navigate("/");
   }
 
-  const handleProfilePictureChange = async (event) => {
-    const file = event.target.files[0];
+  const handleProfilePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+    const file = files[0];
     if (file) {
       const formData = new FormData();
       formData.append('profilePicture', file);
@@ -46,7 +48,7 @@ const Profile = () => {
         }
       } catch (error) {
         console.error('Error uploading profile picture:', error);
-        if (error.response) {
+        if (axios.isAxiosError(error) && error.response) {
           console.error('Response data:', error.response.data);
           console.error('Response status:', error.response.status);
           console.error('Response headers:', error.response.headers);
