@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    overflow: scroll; /* Hiện thanh cuộn nhưng cho phép cuộn */
+}
+
+body::-webkit-scrollbar {
+    display: none; /* Ẩn thanh cuộn */
+}
+
+
+.text-white-important {
+    color: white !important;
+    text-decoration: none !important;
+}

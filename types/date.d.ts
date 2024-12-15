@@ -1,0 +1,4 @@
+interface Date {
+    yyyymmdd(): string;
+  }
+  

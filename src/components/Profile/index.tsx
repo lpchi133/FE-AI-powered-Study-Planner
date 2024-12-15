@@ -14,9 +14,7 @@ const Profile = () => {
   }
 
   const handleProfilePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-    const file = files[0];
+    const file = event.target.files?.[0];
     if (file) {
       const formData = new FormData();
       formData.append('profilePicture', file);
@@ -46,12 +44,14 @@ const Profile = () => {
         } else {
           console.error('Failed to update profile picture');
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error uploading profile picture:', error);
-        if (axios.isAxiosError(error) && error.response) {
-          console.error('Response data:', error.response.data);
-          console.error('Response status:', error.response.status);
-          console.error('Response headers:', error.response.headers);
+        if (axios.isAxiosError(error)) {
+          console.error('Response data:', error.response?.data);
+          console.error('Response status:', error.response?.status);
+          console.error('Response headers:', error.response?.headers);
+        } else {
+          console.error('Unexpected error:', error);
         }
       }
     }

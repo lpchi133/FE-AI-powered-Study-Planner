@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAxios from "../../hooks/useAxios";
@@ -18,11 +18,18 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginData>();
-  const { login } = useAuth();
+  const { login, user } = useAuth(); // Add `user` from useAuth
   const axiosInstance = useAxios();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+
+  // Check if the user is already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/"); // Redirect to the home page if logged in
+    }
+  }, [user, navigate]);
 
   const mutation = useMutation({
     mutationFn: async (data: LoginData) => {

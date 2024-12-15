@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 // import useAxios from "../hooks/useAxios";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -17,10 +17,11 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   fetchProfile: () => void;
+  loading: boolean; // Add loading state
 }
 
-// Create context
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Create AuthContext
+const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 // Define AuthProvider component
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -28,8 +29,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.getItem("accessToken")
   );
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true); // Add loading state
 
-  // Fetch user profile from the backend
   const fetchProfile = async () => {
     if (accessToken) {
       try {
@@ -41,25 +42,26 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             },
           }
         );
-        console.log("response ", response);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching user profile:", error);
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          logout(); // Token expires then logout
+          logout(); 
           toast.error("Your session has expired. Please log in again.");
         }
+      } finally {
+        setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
   };
 
-  // When accessToken changes, fetch user profile
   useEffect(() => {
-    console.log("accesstoken", accessToken);
     if (accessToken) {
       fetchProfile();
     } else {
-      setUser(null); // Clear user info when logged out
+      setLoading(false); // No token means we're done loading
     }
   }, [accessToken]);
 
@@ -70,7 +72,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     setAccessToken(null);
-    setUser(null); // Clear user information on logout
+    setUser(null);
     localStorage.removeItem("accessToken");
   };
 
@@ -82,6 +84,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         logout,
         fetchProfile,
+        loading, // Expose loading state
       }}
     >
       {children}
@@ -90,3 +93,4 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export { AuthProvider, AuthContext };
+export type { AuthContextType };

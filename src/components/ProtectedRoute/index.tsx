@@ -2,15 +2,16 @@ import { useAuth } from "../../hooks/useAuth";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const { user, logout } = useAuth();
+  const { user, loading } = useAuth();
 
-  // If not logged in, redirect to login page
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator while AuthContext is initializing
+  }
+
   if (!user) {
-    logout();
     return <Navigate to="/login" />;
   }
 
-  // If logged in, display the route content
   return <Outlet />;
 };
 
