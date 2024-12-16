@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Suspense, lazy } from 'react';
 import DnDCalendar from "./components/DnDCalendar";
 
+import AIChatBox from "./components/AIChatBox";
 
 const queryClient = new QueryClient();
 const ViewTasksWrapper = lazy(() => import('./components/Todo/ViewTasksWrapper'));
@@ -31,6 +32,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/" element={<ViewTasksWrapper isDark={false} />} /> 
               <Route path="/calendar" element={<DnDCalendar/>} />
+              <Route path="/ai_chat_box" element={<AIChatBox />} />
             </Route>
 
             <Route path="/register" element={<Register />} />
