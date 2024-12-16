@@ -97,7 +97,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
     .then(response => response.json())
     .then(data => {
         
-        console.log("Received data:", data); // In ra dữ liệu nhận được
+        // console.log("Received data:", data); // In ra dữ liệu nhận được
 
         const OGdata: TaskType[] = [];
         let keyId = 1;
@@ -124,7 +124,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
           }
         });
         
-        console.log("Processed data:", OGdata); // In ra dữ liệu đã xử lý
+        // console.log("Processed data:", OGdata); // In ra dữ liệu đã xử lý
         
         this.setState({
           originalData: OGdata
@@ -271,50 +271,55 @@ class ViewTasks extends Component<TodoProps, TodoState> {
   
 
   completedTask = (id: string, date: string, time: string) => {
-    this.state.todoItems.forEach(item => {
-      
-      if(id.toString().localeCompare(item.id.toString()) === 0) {
+    const updatedData = this.state.todoItems.map(item => {
+      if (id.toString().localeCompare(item.id.toString()) === 0) {
         item.status = "Completed";
         item.date = date;
         const formattedTime = time.padStart(5, '0');
         item.time = formattedTime;
-
+  
         const updateItem = {
-          "id": item.id,
-          "description": item.description,
-          "priority": item.priority, 
-          "status": item.status,
-          "label": item.label,
-          "start_date": item.start_date,
-          "start_time": item.start_time,
-          "date": item.date,
-          "time": item.time,
-        }
-
-        const accessToken = this.props.authToken;
-        
-        const requestOptions = {
-            method: 'POST',
-            headers: { 
-                "Content-Type": "application/json",
-                'Authorization': `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify(updateItem) 
+          id: item.id,
+          description: item.description,
+          priority: item.priority, 
+          status: item.status,
+          label: item.label,
+          start_date: item.start_date,
+          start_time: item.start_time,
+          date: item.date,
+          time: item.time,
         };
-
+  
+        const accessToken = this.props.authToken;
+        const requestOptions = {
+          method: 'POST',
+          headers: { 
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(updateItem) 
+        };
+  
         fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks/updateTask`, requestOptions)
-        .then(response => {
-          if(response.status !== 201) {
+          .then(response => {
+            if (response.status !== 201) {
               toast.error("There was some problem with that. We're currently working on fixing it. Thank You.");
-          }
-        });
+            }
+          });
+  
+        return { ...item }; // Trả về bản sao đã cập nhật
       }
+      return item;
     });
-
-    setTimeout(() => {
+  
+    // Cập nhật state mới
+    this.setState({ todoItems: updatedData }, () => {
       this.updateData();
-    }, 1);
-  }
+    });
+  };
+  
+  
+  
 
   searchFunction = (title: string, fromDate: string, toDate: string, val: number = 1) => {
     if (val === 1) {
