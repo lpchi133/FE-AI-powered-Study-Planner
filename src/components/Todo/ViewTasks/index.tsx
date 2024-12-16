@@ -8,6 +8,7 @@ import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons'
 import Archive from '../Archive';
 import logo from '/images/preview.jpg'
 import './ViewTask.css';
+import { toast } from 'react-toastify';
 
 interface TaskItem {
     id: string;
@@ -304,7 +305,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
         fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks/updateTask`, requestOptions)
         .then(response => {
           if(response.status !== 201) {
-              alert("There was some problem with that. We're currently working on fixing it. Thank You.");
+              toast.error("There was some problem with that. We're currently working on fixing it. Thank You.");
           }
         });
       }
@@ -347,7 +348,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
           completedTodo: completed
         });
       } else {
-        alert("No Search Results.");
+        toast.info("No Search Results.");
       }
     } else {
       this.updateData();
@@ -390,7 +391,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
           if(response.status === 201) {
             this.updateData();
           } else {
-              alert("There was some problem with that. We're currently working on fixing it. Thank You.");
+              toast.error("There was some problem with that. We're currently working on fixing it. Thank You.");
           }
         });
       }

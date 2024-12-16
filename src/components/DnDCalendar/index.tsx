@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import withDragAndDrop, { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
+import withDragAndDrop, {
+  EventInteractionArgs,
+} from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
@@ -23,9 +25,9 @@ interface Task {
 }
 
 const priorityColors: Record<string, string> = {
-  High: "#ef4444",
-  Medium: "#eab308",
-  Low: "#22c55e",
+  HIGH: "#ef4444",
+  MEDIUM: "#eab308",
+  LOW: "#22c55e",
 };
 
 const DnDCalendar: React.FC = () => {
@@ -33,39 +35,43 @@ const DnDCalendar: React.FC = () => {
   const axiosInstance = useAxios();
   const queryClient = useQueryClient();
   const [calendarEvents, setCalendarEvents] = useState<Task[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   // Fetch tasks
   const { isLoading, error } = useQuery({
     queryKey: ["tasks", user?.id],
     queryFn: async () => {
-        const response = await axiosInstance.get(`/tasks`);
-        console.log("API response:", response.data);
-        const data = response.data as Task[];
-        const events = data.map((task) => ({
-          ...task,
-          dateTimeSet: task.dateTimeSet ? new Date(task.dateTimeSet) : undefined,
-          dueDateTime: task.dueDateTime ? new Date(task.dueDateTime) : undefined,
-        }));
-        console.log("Mapped events:", events);
-        setCalendarEvents(events);
-        return data;
+      const response = await axiosInstance.get(`/tasks`);
+      console.log("API response:", response.data);
+      const data = response.data as Task[];
+      const events = data.map((task) => ({
+        ...task,
+        dateTimeSet: task.dateTimeSet ? new Date(task.dateTimeSet) : undefined,
+        dueDateTime: task.dueDateTime ? new Date(task.dueDateTime) : undefined,
+      }));
+      console.log("Mapped events:", events);
+      setCalendarEvents(events);
+      return data;
     },
   });
 
   // Mutation to update a task
   const updateTaskMutation = useMutation({
     mutationFn: async (updatedTask: Task) => {
-      const response = await axiosInstance.post(`/updateTimeTask`, {
+      const response = await axiosInstance.post(`/tasks/updateTimeTask`, {
         id: updatedTask.id,
-        start_date: updatedTask.dateTimeSet?.toISOString(),
-        date: updatedTask.dueDateTime?.toISOString(),
+        start_date: updatedTask.dateTimeSet?.toISOString().split("T")[0],
+        date: updatedTask.dueDateTime?.toISOString().split("T")[0],
       });
       return response.data;
     },
     onSuccess: (updatedTask) => {
       // Optimistically update the calendar events
       setCalendarEvents((prevEvents) =>
-        prevEvents.map((event) => (event.id === updatedTask.id ? updatedTask : event))
+        prevEvents.map((event) =>
+          event.id === updatedTask.id ? updatedTask : event
+        )
       );
 
       // Optionally refetch tasks to ensure consistency
@@ -82,13 +88,17 @@ const DnDCalendar: React.FC = () => {
 
     const updatedTask = {
       ...args.event,
-      dateTimeSet: new Date(new Date(args.start).setHours(startHour, startMinute)),
+      dateTimeSet: new Date(
+        new Date(args.start).setHours(startHour, startMinute)
+      ),
       dueDateTime: new Date(new Date(args.end).setHours(endHour, endMinute)),
     };
 
     // Update state optimistically
     setCalendarEvents((prevEvents) =>
-      prevEvents.map((event) => (event.id === updatedTask.id ? updatedTask : event))
+      prevEvents.map((event) =>
+        event.id === updatedTask.id ? updatedTask : event
+      )
     );
 
     // Send update to the server
@@ -104,17 +114,31 @@ const DnDCalendar: React.FC = () => {
 
     const updatedTask = {
       ...args.event,
-      dateTimeSet: new Date(new Date(args.start).setHours(startHour, startMinute)),
+      dateTimeSet: new Date(
+        new Date(args.start).setHours(startHour, startMinute)
+      ),
       dueDateTime: new Date(new Date(args.end).setHours(endHour, endMinute)),
     };
 
     // Update state optimistically
     setCalendarEvents((prevEvents) =>
-      prevEvents.map((event) => (event.id === updatedTask.id ? updatedTask : event))
+      prevEvents.map((event) =>
+        event.id === updatedTask.id ? updatedTask : event
+      )
     );
 
     // Send update to the server
     updateTaskMutation.mutate(updatedTask);
+  };
+
+  const handleSelectEvent = (task: Task) => {
+    setSelectedTask(task);
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedTask(null);
   };
 
   const localizer = momentLocalizer(moment);
@@ -127,7 +151,7 @@ const DnDCalendar: React.FC = () => {
         color: "white",
         padding: "0px 5px",
         border: "none",
-        borderRadius: '5px',
+        borderRadius: "5px",
       },
     };
   };
@@ -144,28 +168,65 @@ const DnDCalendar: React.FC = () => {
             events={calendarEvents}
             startAccessor={(event) => event.dateTimeSet || new Date()}
             endAccessor={(event) => event.dueDateTime || new Date()}
-            style={{ height: 400 }}
+            titleAccessor={(event) => event.itemLabel}
+            style={{ height: 500 }}
             onEventDrop={handleEventDrop}
             resizable
             onEventResize={handleEventResize}
             eventPropGetter={eventStyleGetter}
+            onSelectEvent={handleSelectEvent}
           />
           <div className="mt-4">
             <h3 className="text-sm font-semibold text-gray-600">Legend:</h3>
             <ul className="flex gap-4 mt-2 text-sm">
               <li className="flex items-center">
-                <span className="inline-block w-4 h-4 bg-red-500 mr-2"></span> High Priority
+                <span className="inline-block w-4 h-4 bg-red-500 mr-2"></span>{" "}
+                High Priority
               </li>
               <li className="flex items-center">
-                <span className="inline-block w-4 h-4 bg-yellow-500 mr-2"></span> Medium Priority
+                <span className="inline-block w-4 h-4 bg-yellow-500 mr-2"></span>{" "}
+                Medium Priority
               </li>
               <li className="flex items-center">
-                <span className="inline-block w-4 h-4 bg-green-500 mr-2"></span> Low Priority
+                <span className="inline-block w-4 h-4 bg-green-500 mr-2"></span>{" "}
+                Low Priority
               </li>
             </ul>
           </div>
         </div>
       </DndProvider>
+      {isPopupOpen && selectedTask && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-w-md">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+              {selectedTask.itemLabel}
+            </h2>
+            <p className="text-gray-700 mb-2">
+              <strong>Description:</strong> {selectedTask.itemDescription}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <strong>Priority:</strong> {selectedTask.itemPriority}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <strong>Status:</strong> {selectedTask.itemStatus}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <strong>Start Date:</strong>{" "}
+              {selectedTask.dateTimeSet?.toLocaleString() || "N/A"}
+            </p>
+            <p className="text-gray-700 mb-4">
+              <strong>Due Date:</strong>{" "}
+              {selectedTask.dueDateTime?.toLocaleString() || "N/A"}
+            </p>
+            <button
+              onClick={handleClosePopup}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

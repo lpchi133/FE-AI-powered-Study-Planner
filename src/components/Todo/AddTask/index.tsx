@@ -6,6 +6,7 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { toast } from 'react-toastify';
 
 interface AddTaskProps {
     show: boolean;
@@ -86,9 +87,9 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
                     this.props.addnewtask(this.state.item);
                     this.props.onHide();
                     this.handleReset();
-                    alert('Task Added.');
+                    toast.success('Task Added Successfully');
                 } else {
-                    alert("There was some problem with that. We're currently working on fixing it. Thank You.");
+                    toast.error("There was some problem with that. We're currently working on fixing it. Thank You.");
                 }
             })
             .then((data) => {
@@ -111,7 +112,7 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
             event.stopPropagation();
             if (daysDiff < 0) {
                 this.setValidated(false);
-                alert("Select The Dates Properly.");
+                toast.error("Select The Dates Properly.");
             } else {
             this.setValidated(true);
             }

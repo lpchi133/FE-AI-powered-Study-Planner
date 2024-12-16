@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { toast } from 'react-toastify';
 
 interface Task {
     id: string;
@@ -76,9 +77,9 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                     this.props.updateData();
                     this.props.onHide();
                     // this.handleReset();
-                    alert('Task Edited.');
+                    toast.success('Task Edited.');
                 } else {
-                    alert("There was some problem with that. We're currently working on fixing it. Thank You.");
+                    toast.error("There was some problem with that. We're currently working on fixing it. Thank You.");
                 }
             });
     };
@@ -96,7 +97,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             event.stopPropagation();
             if (daysDiff < 0) {
                 this.setValidated(false);
-                alert("Select The Dates Properly.");
+                toast.error("Select The Dates Properly.");
             } else {
             this.setValidated(true);
             }
