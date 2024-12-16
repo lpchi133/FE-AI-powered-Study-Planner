@@ -105,7 +105,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             const nowDate = Date.now();
             const StartDate = new Date(this.state.item.start_date + ' ' + this.state.item.start_time);
             const dueDate = new Date(this.state.item.date + ' ' + this.state.item.time);
-            const daysDiff = (dueDate.getTime() - StartDate.getTime()) / (1000 * 3600 * 24);
+            const daysDiff = (dueDate.getTime() - nowDate) / (1000 * 3600 * 24);
             let val = 'Ongoing';
             
             // So sánh StartDate với nowDate

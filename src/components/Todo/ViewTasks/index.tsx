@@ -133,7 +133,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
             const nowDate = Date.now();
             const sDate = new Date(item.start_date + " " + item.start_time);
             const dueDate = new Date(item.date + " " + item.time);
-            const daysDiff = (dueDate.getTime() - sDate.getTime()) / (1000 * 3600 * 24);
+            const daysDiff = (dueDate.getTime() - nowDate) / (1000 * 3600 * 24);
 
             if(item.status !== 'Completed') {
               if (sDate.getTime() > nowDate) {
