@@ -36,8 +36,9 @@ interface ArchiveProps {
         status: string;
         label: string;
         date: string;
-        // start_date: string;
+        start_date: string;
         time: string;
+        start_time: string;
         authToken: string | null;
     }> ;
     completedTask: (id: string, date: string, time: string) => void;
@@ -115,10 +116,12 @@ class Archive extends React.Component<ArchiveProps, ArchiveState> {
                                                 <th scope="col"></th>
                                                 <th scope="col">Title</th>
                                                 <th scope="col">Priority</th>
+                                                <th scope="col">Start Date</th>
+                                                <th scope="col">Start Time</th>  
                                                 <th scope="col">Status</th>
-                                                <th scope="col">Description</th>
-                                                <th scope="col">Completion Date</th>
-                                                <th scope="col">Time</th>   
+                                                <th scope="col" className="des-column">Description</th>
+                                                <th scope="col" className="des-column">Completion Date</th>
+                                                <th scope="col" className="end-time-column">Completion Time</th>   
                                                 <th scope="col"></th>
                                             </tr>
                                         </thead>
@@ -131,6 +134,8 @@ class Archive extends React.Component<ArchiveProps, ArchiveState> {
                                                     priority={item.priority}
                                                     status={item.status}
                                                     label={item.label}
+                                                    start_date={item.start_date}
+                                                    start_time={item.start_time}
                                                     date={item.date}
                                                     time={item.time}
                                                     comp={"Archive"}

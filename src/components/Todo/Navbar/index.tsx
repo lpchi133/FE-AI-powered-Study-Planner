@@ -14,11 +14,12 @@ interface NavbarAboveProps {
   isDark: boolean;
   uname: string;
   authToken: string | null;
-  searchFunction: (fromDate: string, toDate: string, reset?: number) => void;
+  searchFunction: (title: string, fromDate: string, toDate: string, reset?: number) => void;
   toggleModal: () => void;
 }
 
 interface NavbarAboveState {
+  title: string;
   fromDate: string;
   toDate: string;
   validated: boolean;
@@ -29,6 +30,7 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
   constructor(props: NavbarAboveProps) {
     super(props);
     this.state = {
+      title: "",
       fromDate: "",
       toDate: "",
       validated: false
@@ -62,19 +64,20 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
       }
 
     } else {
-      this.props.searchFunction(this.state.fromDate, this.state.toDate);
+      this.props.searchFunction(this.state.title, this.state.fromDate, this.state.toDate);
       this.setValidated(false);
     }
   }
 
   handleReset = () => {
     this.setState({
+      title: "",
       fromDate: "",
       toDate: ""
     });
   
     this.setValidated(false);
-    this.props.searchFunction(this.state.fromDate, this.state.toDate, 0);
+    this.props.searchFunction(this.state.title, this.state.fromDate, this.state.toDate, 0);
   }
   
 
@@ -125,39 +128,9 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
       color: "#555"
     }
 
-    // const navButtonDark = {
-    //   color: "white",
-    //   background: "#555",
-    //   marginTop: "-8px",
-    //   marginBottom: "-8px",
-    //   paddingTop: "8px",
-    //   paddingBottom: "8px",
-    // };
-
-    // const navButtonLight = {
-    //   color: "#555",
-    //   background: "white",
-    //   marginTop: "-8px",
-    //   marginBottom: "-8px",
-    //   paddingTop: "8px",
-    //   paddingBottom: "8px",
-    // };
-
-    // const abs = {
-    //   top: "1vh",
-    //   right: "1vw"
-    // }
 
     return (
       <div style={this.props.isDark ? bgDark : bgLight}>
-        {/* <Navbar collapseOnSelect expand="xs" style={this.props.isDark ? bgDark : bgLight} variant="dark" fixed="top" className="fixedTop-1">
-          <Navbar.Brand href="#home">Todo List</Navbar.Brand>
-          <Nav className="justify-content-end ml-auto">
-            <NavDropdown style={abs} className="position-absolute" title={"Welcome " + this.props.uname} id="basic-nav-dropdown">
-              <NavDropdown.Item onClick={this.logoutCall} style={this.props.isDark ? navButtonDark : navButtonLight}>Logout</NavDropdown.Item>
-            </NavDropdown>
-          </Nav>
-        </Navbar> */}
         <Navbar collapseOnSelect bg={this.props.isDark ? "dark" : "light"} variant="dark" className="fixedTop-2 mx-auto">
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
@@ -169,12 +142,33 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
                 onReset={this.handleReset}
                 className="row"
               >
-                <Form.Group as={Col} lg="2" controlId="validationDate">
-                  <Button className="addtask-btn btn-block" variant="warning" onClick={this.toggleModal}>+ Add Task</Button>
+                {/* Nút Add Task */}
+                <Form.Group as={Col} lg="2" controlId="validationAddTask">
+                  <Button className="addtask-btn btn-block" variant="warning" onClick={this.toggleModal}>
+                    + Add Task
+                  </Button>
                 </Form.Group>
-                <Form.Group as={Col} lg="4" controlId="validationFromDate">
+
+                {/* Ô Search Tasks */}
+                <Form.Group as={Col} lg="4" controlId="validationSearchTasks">
                   <InputGroup>
-                      <InputGroup.Text id="inputGroupPrepend1">From</InputGroup.Text>
+                    <InputGroup.Text id="inputGroupSearchTasks">Search</InputGroup.Text>
+                    <Form.Control
+                      type="text"
+                      placeholder="Search tasks..."
+                      name="title"
+                      value={this.state.title}
+                      onChange={this.handleInputChange}
+                      aria-describedby="inputGroupSearchTasks"
+                      style={this.props.isDark ? bgDark : undefined}
+                    />
+                  </InputGroup>
+                </Form.Group>
+
+                {/* From Date */}
+                <Form.Group as={Col} lg="2" controlId="validationFromDate">
+                  <InputGroup>
+                    <InputGroup.Text id="inputGroupPrepend1">From</InputGroup.Text>
                     <Form.Control
                       type="date"
                       name="fromDate"
@@ -187,14 +181,13 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
                     <Form.Control.Feedback type="invalid">
                       Please choose a proper date.
                     </Form.Control.Feedback>
-                    <Form.Control.Feedback>
-                      Looks good.
-                    </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
-                <Form.Group as={Col} lg="4" controlId="validationToDate">
+
+                {/* To Date */}
+                <Form.Group as={Col} lg="2" controlId="validationToDate">
                   <InputGroup>
-                      <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
+                    <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
                     <Form.Control
                       type="date"
                       name="toDate"
@@ -207,17 +200,18 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
                     <Form.Control.Feedback type="invalid">
                       Please choose a proper date.
                     </Form.Control.Feedback>
-                    <Form.Control.Feedback>
-                      Looks good.
-                    </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
-                <Form.Group as={Col} lg="1" controlId="validationDate">
+
+                {/* Nút Submit */}
+                <Form.Group as={Col} lg="1" controlId="validationSubmit">
                   <Button className="search-btn btn-block" variant="primary" type="submit">
                     <FontAwesomeIcon icon={faSearch} />
                   </Button>
                 </Form.Group>
-                <Form.Group as={Col} lg="1" controlId="validationDate">
+
+                {/* Nút Reset */}
+                <Form.Group as={Col} lg="1" controlId="validationReset">
                   <Button className="search-btn btn-block" variant="danger" type="reset">
                     <FontAwesomeIcon icon={faRedoAlt} />
                   </Button>

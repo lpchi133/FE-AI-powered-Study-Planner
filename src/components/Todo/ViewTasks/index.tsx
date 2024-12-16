@@ -15,7 +15,7 @@ interface TaskItem {
     itemDescription: string;
     itemStatus: string;
     itemLabel: string;
-    // startDateTime: string;
+    dateTimeSet: string;
     dueDateTime: string; // Giả sử định dạng là chuỗi; có thể điều chỉnh nếu cần
     authToken: string | null;
   }
@@ -28,8 +28,9 @@ interface TaskType {
   status: string;
   label: string;
   date: string;
-  // start_date: string;
+  start_date: string;
   time: string;
+  start_time: string;
   authToken: string | null;
 }
 
@@ -42,10 +43,12 @@ interface TodoState {
     priority: 'asc' | 'desc' | '';
     status: 'asc' | 'desc' | '';
     label: 'asc' | 'desc' | '';
+    start_date: 'asc' | 'desc' | '';
+    start_time: 'asc' | 'desc' | '';
     date: 'asc' | 'desc' | '';
     time: 'asc' | 'desc' | '';
   };
-  currentSort: 'priority' | 'status' | 'label' | 'date' | 'time';
+  currentSort: 'priority' | 'status' | 'label' | 'start_date' | 'start_time' | 'date' | 'time';
   username: string;
 }
 
@@ -66,6 +69,8 @@ class ViewTasks extends Component<TodoProps, TodoState> {
       priority: '',
       status: '',
       label: '',
+      start_date: 'asc',
+      start_time: '',
       date: 'asc',
       time: ''
     },
@@ -97,7 +102,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
         let keyId = 1;
 
         data.forEach((item: TaskItem) => {
-          if (item.dueDateTime && item.itemDescription && item.itemStatus && item.itemLabel) {
+          if (item.dueDateTime && item.itemDescription && item.itemStatus && item.itemLabel && item.dateTimeSet) {
             const newData: TaskType = {
               key: keyId, 
               id: item.id,
@@ -105,6 +110,8 @@ class ViewTasks extends Component<TodoProps, TodoState> {
               description: item.itemDescription,
               status: item.itemStatus,
               label: item.itemLabel,
+              start_date: item.dateTimeSet.slice(0, 10),
+              start_time: item.dateTimeSet.slice(11, 19),
               date: item.dueDateTime.slice(0, 10),
               time: item.dueDateTime.slice(11, 19),
               authToken: this.props.authToken,
@@ -123,17 +130,21 @@ class ViewTasks extends Component<TodoProps, TodoState> {
         }, () => {
           this.state.originalData.forEach(item => {
             const nowDate = Date.now();
+            const sDate = new Date(item.start_date + " " + item.start_time);
             const dueDate = new Date(item.date + " " + item.time);
-            const daysDiff = (dueDate.getTime() - nowDate) / (1000 * 3600 * 24);
+            const daysDiff = (dueDate.getTime() - sDate.getTime()) / (1000 * 3600 * 24);
 
             if(item.status !== 'Completed') {
-              if(daysDiff < 0) {
+              if (sDate.getTime() > nowDate) {
+                item.status = "NotStarted";
+              } else if (daysDiff < 0) {
                 item.status = "Overdue";
-              } else if(daysDiff <= 2) {
+              } else if (daysDiff <= 2) {
                 item.status = "Pending";
-              } else {
+              }else {
                 item.status = "Ongoing";
-              }
+            }
+              
               todoData.push(item);  
             } else {
               completed.push(item);
@@ -273,9 +284,10 @@ class ViewTasks extends Component<TodoProps, TodoState> {
           "priority": item.priority, 
           "status": item.status,
           "label": item.label,
-          // "start_date": item.start_date,
+          "start_date": item.start_date,
+          "start_time": item.start_time,
           "date": item.date,
-          "time": item.time
+          "time": item.time,
         }
 
         const accessToken = this.props.authToken;
@@ -300,32 +312,36 @@ class ViewTasks extends Component<TodoProps, TodoState> {
 
     setTimeout(() => {
       this.updateData();
-    }, 10);
+    }, 1);
   }
 
-  searchFunction = (fromDate: string, toDate: string, val: number = 1) => {
-    if(val === 1) {
+  searchFunction = (title: string, fromDate: string, toDate: string, val: number = 1) => {
+    if (val === 1) {
       const newTodo: TaskType[] = [];
       const completed: TaskType[] = [];
-
+  
       this.state.originalData.forEach(item => {
         const current = new Date(item.date + " 00:00:00");
         const fDate = new Date(fromDate + " 00:00:00");
         const tDate = new Date(toDate + " 00:00:00");
-
+  
+        // Tính khoảng cách ngày
         const fDaysDiff = (current.getTime() - fDate.getTime()) / (1000 * 3600 * 24);
         const tDaysDiff = (current.getTime() - tDate.getTime()) / (1000 * 3600 * 24);
-        
-        if(fDaysDiff >= 0 && tDaysDiff <= 0) {
-          if(item.status === "Completed") {
-            completed.push(item);
-          } else {
-            newTodo.push(item);
+  
+        // Kiểm tra ngày và title (dùng includes để tìm kiếm mềm)
+        if (fDaysDiff >= 0 && tDaysDiff <= 0) {
+          if (item.label.toLowerCase().includes(title.toLowerCase())) {
+            if (item.status === "Completed") {
+              completed.push(item);
+            } else {
+              newTodo.push(item);
+            }
           }
         }
       });
-
-      if(newTodo.length >= 0) {
+  
+      if (newTodo.length > 0 || completed.length > 0) {
         this.setState({
           todoItems: newTodo,
           completedTodo: completed
@@ -336,7 +352,8 @@ class ViewTasks extends Component<TodoProps, TodoState> {
     } else {
       this.updateData();
     }
-  }
+  };
+  
 
   // aFunctionCall = (data: string | null) => {
   //   this.props.changeLogin(data);
@@ -351,7 +368,8 @@ class ViewTasks extends Component<TodoProps, TodoState> {
           "priority": item.priority, 
           "status": item.status,
           "label": item.label,
-          // "start_date": item.start_date,
+          "start_date": item.start_date,
+          "start_time": item.start_time,
           "date": item.date,
           "time": item.time
         }
@@ -438,22 +456,34 @@ class ViewTasks extends Component<TodoProps, TodoState> {
                       {this.getSortIcon("priority")}
                     </div>
                   </th>
+                  <th onClick={() => this.sortTasks("start_date", true)} scope="col">
+                    <div className="sort-icon">
+                      Start Date
+                      {this.getSortIcon("start_date")}
+                    </div>
+                  </th>
+                  <th onClick={() => this.sortTasks("start_time", true)} scope="col">
+                    <div className="sort-icon">
+                      Start Time
+                      {this.getSortIcon("start_time")}
+                    </div>
+                  </th>
                   <th onClick={() => this.sortTasks("status", true)} scope="col">
                     <div className="sort-icon">
                       Status
                       {this.getSortIcon("status")}
                     </div>
                   </th>
-                  <th scope="col">Description</th>
+                  <th scope="col"  className="des-column">Description</th>
                   <th onClick={() => this.sortTasks("date", true)} scope="col">
                     <div className="sort-icon">
-                      Date
+                      End Date
                       {this.getSortIcon("date")}
                     </div>
                   </th>
-                  <th onClick={() => this.sortTasks("time", true)} scope="col">
+                  <th onClick={() => this.sortTasks("time", true)} scope="col" className="end-time-column">
                     <div className="sort-icon">
-                      Time
+                      End Time
                       {this.getSortIcon("time")}
                     </div>
                   </th>
@@ -470,7 +500,8 @@ class ViewTasks extends Component<TodoProps, TodoState> {
                       desc={item.description}
                       status={item.status}
                       label={item.label}
-                      // start_date={item.start_date}
+                      start_date={item.start_date}
+                      start_time={item.start_time}
                       date={item.date}
                       time={item.time}
                       comp={""}

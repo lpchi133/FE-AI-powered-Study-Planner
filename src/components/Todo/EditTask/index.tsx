@@ -12,7 +12,8 @@ interface Task {
     priority: string;
     status: string;
     label: string;
-    // start_date: string;
+    start_date: string;
+    start_time: string;
     date: string;
     time: string;
 }
@@ -43,7 +44,8 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                 priority: this.props.editTask.priority,
                 status: this.props.editTask.status,
                 label: this.props.editTask.label,
-                // start_date: this.props.editTask.start_date,
+                start_date: this.props.editTask.start_date,
+                start_time: this.props.editTask.start_time.slice(0, 5), 
                 date: this.props.editTask.date,
                 time: this.props.editTask.time.slice(0, 5),
             },
@@ -84,21 +86,38 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
     handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         const form = event.currentTarget;
         event.preventDefault();
-        if (form.checkValidity() === false) {
+
+        const fDate = new Date(this.state.item.start_date + " " + this.state.item.start_time);
+        const tDate = new Date(this.state.item.date + " " + this.state.item.time);
+
+        const daysDiff = (tDate.getTime() - fDate.getTime()) / (1000 * 3600 * 24);
+
+        if (form.checkValidity() === false || (daysDiff < 0 || Number.isNaN(daysDiff))) {
             event.stopPropagation();
+            if (daysDiff < 0) {
+                this.setValidated(false);
+                alert("Select The Dates Properly.");
+            } else {
             this.setValidated(true);
+            }
         } else {
             const nowDate = Date.now();
-            const dueDate = new Date(`${this.state.item.date} ${this.state.item.time}`);
-            const daysDiff = (dueDate.getTime() - nowDate) / (1000 * 3600 * 24);
+            const StartDate = new Date(this.state.item.start_date + ' ' + this.state.item.start_time);
+            const dueDate = new Date(this.state.item.date + ' ' + this.state.item.time);
+            const daysDiff = (dueDate.getTime() - StartDate.getTime()) / (1000 * 3600 * 24);
             let val = 'Ongoing';
-
-            if (daysDiff < 0) {
-                val = 'Overdue';
+            
+            // So sánh StartDate với nowDate
+            if (StartDate.getTime() > nowDate) {
+                val = 'NotStarted'; // StartDate nằm trong tương lai
+            } else if (daysDiff < 0) {
+                val = 'Overdue'; // dueDate đã qua
             } else if (daysDiff <= 2) {
-                val = 'Pending';
+                val = 'Pending'; // Còn ít hơn hoặc bằng 2 ngày
+            } else {
+                val = 'Ongoing'; // Trường hợp còn lại
             }
-
+            console.log(val);
             this.setState(
                 prevState => ({
                     item: { ...prevState.item, status: val },
@@ -118,7 +137,8 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                 priority: '',
                 status: '',
                 label: '',
-                // start_date: '',
+                start_date: '',
+                start_time: '',
                 date: '',
                 time: '',
             },
@@ -192,7 +212,71 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                                 </Form.Group>
                             </Row>
                             <Row>
-                                <Form.Group as={Col} md="12" controlId="validationPriority">
+                                
+                                <Form.Group as={Col} md="4" controlId="validationLabel">
+                                    <Form.Control
+                                        type="text"
+                                        name="label"
+                                        placeholder="Enter Label"
+                                        value={this.state.item.label}
+                                        onChange={this.handleInputChange}
+                                        style={{
+                                            ...(this.props.isDark === true ? dark : undefined),
+                                            marginBottom: '15px' // Adding margin bottom
+                                        }}
+                                        required
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Please enter label.
+                                    </Form.Control.Feedback>
+                                    <Form.Control.Feedback>
+                                        Looks good.
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col} md="4" controlId="validationDate" style={{marginBottom: '15px'}}>
+                                    <InputGroup>
+                                        
+                                        <InputGroup.Text id="inputGroupPrepend">Start Date</InputGroup.Text>
+                                        <Form.Control
+                                            type="date"
+                                            name="start_date"
+                                            aria-describedby="inputGroupPrepend"
+                                            value={this.state.item.start_date}
+                                            onChange={this.handleInputChange}
+                                            style={this.props.isDark ? dark : undefined}
+                                            required
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            Please choose a proper deadline.
+                                        </Form.Control.Feedback>
+                                        <Form.Control.Feedback>
+                                            Looks good.
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Form.Group>
+                                <Form.Group as={Col} md="4" controlId="validationTime" style={{marginBottom: '15px'}}>
+                                    <InputGroup>                                     
+                                        <InputGroup.Text id="inputGroupPrepend">Start Time</InputGroup.Text>
+                                        <Form.Control
+                                            type="time"
+                                            name="start_time"
+                                            aria-describedby="inputGroupPrepend"
+                                            value={this.state.item.start_time}
+                                            onChange={this.handleInputChange}
+                                            style={this.props.isDark ? dark : undefined}
+                                            required
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            Please choose a proper reminder time.
+                                        </Form.Control.Feedback>
+                                        <Form.Control.Feedback>
+                                            Looks good.
+                                        </Form.Control.Feedback>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Row>
+                            <Row>
+                            <Form.Group as={Col} md="4" controlId="validationPriority">
                                     <Form.Select
                                         required
                                         name="priority"
@@ -215,12 +299,10 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                                         Looks good.
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                            </Row>
-                            <Row>
-                                <Form.Group as={Col} md="4" controlId="validationDate">
+                                <Form.Group as={Col} md="4" controlId="validationDate" style={{marginBottom: '15px'}}>
                                     <InputGroup>
                                         
-                                        <InputGroup.Text id="inputGroupPrepend">Date</InputGroup.Text>
+                                        <InputGroup.Text id="inputGroupPrepend">End Date</InputGroup.Text>
                                         <Form.Control
                                             type="date"
                                             name="date"
@@ -240,7 +322,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                                 </Form.Group>
                                 <Form.Group as={Col} md="4" controlId="validationTime">
                                     <InputGroup>                                     
-                                        <InputGroup.Text id="inputGroupPrepend">Time</InputGroup.Text>
+                                        <InputGroup.Text id="inputGroupPrepend">End Time</InputGroup.Text>
                                         <Form.Control
                                             type="time"
                                             name="time"
@@ -258,23 +340,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
                                         </Form.Control.Feedback>
                                     </InputGroup>
                                 </Form.Group>
-                                <Form.Group as={Col} md="4" controlId="validationLabel">
-                                    <Form.Control
-                                        type="text"
-                                        name="label"
-                                        placeholder="Enter Label"
-                                        value={this.state.item.label}
-                                        onChange={this.handleInputChange}
-                                        style={this.props.isDark ? dark : undefined}
-                                        required
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        Please enter label.
-                                    </Form.Control.Feedback>
-                                    <Form.Control.Feedback>
-                                        Looks good.
-                                    </Form.Control.Feedback>
-                                </Form.Group>
+                                
                             </Row>
                             <Row>
                                 <Form.Group className="offset-md-3 col-md-2 mb-3">
