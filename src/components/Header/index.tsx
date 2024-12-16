@@ -1,12 +1,10 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { useState } from "react";
 
 export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation(); // Hook để lấy route hiện tại
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
