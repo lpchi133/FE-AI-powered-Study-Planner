@@ -10,6 +10,7 @@ import Header from "./components/Header";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GoogleUser from "./components/GoogleUser";
+import AIChatBox from "./components/AIChatBox";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,8 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<Profile />} />
             </Route>
+
+            <Route path="/ai_chat_box" element={<AIChatBox />} />
 
             <Route path="/register" element={<Register />} />
           </Routes>

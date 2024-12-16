@@ -39,6 +39,11 @@ const Home = () => {
               Profile
             </button>
           </Link>
+          <Link to="/ai_chat_box">
+            <button className="bg-pink-500 text-white px-4 py-2 rounded">
+              AI Chat Box
+            </button>
+          </Link>
         </div>
       )}
     </div>
