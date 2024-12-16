@@ -1,157 +1,186 @@
-import React, { useState } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import withDragAndDrop, { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
-import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import moment from "moment";
-import { useQuery, useMutation, useQueryClient, UseQueryOptions, QueryKey } from "@tanstack/react-query";
-import useAxios from "../../hooks/useAxios";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/useAuth";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import useAxios from "../../hooks/useAxios";
 
-const DragAndDropCalendar = withDragAndDrop<Task>(Calendar);
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  priority: string;
-  estimatedTime: string;
-  status: string;
-  start?: Date;
-  end?: Date;
+interface LoginData {
+  email: string;
+  password: string;
 }
 
-const priorityColors: Record<string, string> = {
-  High: "#ef4444",
-  Medium: "#eab308",
-  Low: "#22c55e",
-};
-
-const DnDCalendar: React.FC = () => {
-  const { user } = useAuth();
+const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginData>();
+  const { login, user } = useAuth(); // Add `user` from useAuth
   const axiosInstance = useAxios();
-  const queryClient = useQueryClient();
-  const [calendarEvents, setCalendarEvents] = useState<Task[]>([]);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
-  // Fetch tasks
-  const { isLoading, error } = useQuery<Task[]>({
-    queryKey: ["tasks", user?.id],
-    queryFn: async () => {
-      const response = await axiosInstance.get(`/tasks?userId=${user?.id}`);
-      return response.data as Task[];
-    },
-    onSuccess: (data: Task[]) => {
-      const events = data.map((task) => ({
-        ...task,
-        start: task.start ? new Date(task.start) : undefined,
-        end: task.end ? new Date(task.end) : undefined,
-      }));
-      setCalendarEvents(events);
-    },
-  } as UseQueryOptions<Task[], Error, Task[], QueryKey>);
+  // Check if the user is already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/"); // Redirect to the home page if logged in
+    }
+  }, [user, navigate]);
 
-  // Mutation to update a task
-  const updateTaskMutation = useMutation({
-    mutationFn: async (updatedTask: Task) => {
-      const response = await axiosInstance.put(`/tasks/${updatedTask.id}`, updatedTask);
+  const mutation = useMutation({
+    mutationFn: async (data: LoginData) => {
+      setLoading(true);
+      const response = await axiosInstance.post("/auth/login", data);
       return response.data;
     },
-    onSuccess: (updatedTask) => {
-      // Optimistically update the calendar events
-      setCalendarEvents((prevEvents) =>
-        prevEvents.map((event) => (event.id === updatedTask.id ? updatedTask : event))
+    onSuccess: (data) => {
+      login(data.accessToken);
+      toast.success("Login successful!");
+      navigate("/");
+    },
+    onError: (error: { response: { data: { message: string } } }) => {
+      setLoginError(
+        error.response.data.message || "Invalid email or password."
       );
-
-      // Optionally refetch tasks to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["tasks", user?.id] });
+    },
+    onSettled: () => {
+      setLoading(false);
     },
   });
 
-  const handleEventDrop = (args: EventInteractionArgs<Task>) => {
-    const updatedTask = {
-      ...args.event,
-      start: new Date(args.start),
-      end: new Date(args.end),
-    };
-
-    // Update state optimistically
-    setCalendarEvents((prevEvents) =>
-      prevEvents.map((event) => (event.id === updatedTask.id ? updatedTask : event))
-    );
-
-    // Send update to the server
-    updateTaskMutation.mutate(updatedTask);
+  const onSubmit = (data: LoginData) => {
+    setLoginError("");
+    mutation.mutate(data);
   };
 
-  const handleEventResize = (args: EventInteractionArgs<Task>) => {
-    const updatedTask = {
-      ...args.event,
-      start: new Date(args.start),
-      end: new Date(args.end),
-    };
-
-    // Update state optimistically
-    setCalendarEvents((prevEvents) =>
-      prevEvents.map((event) => (event.id === updatedTask.id ? updatedTask : event))
-    );
-
-    // Send update to the server
-    updateTaskMutation.mutate(updatedTask);
+  const goToGoogle = async () => {
+    window.location.replace(`${import.meta.env.VITE_ENDPOINT_URL}/auth/google`);
   };
-
-  const localizer = momentLocalizer(moment);
-
-  const eventStyleGetter = (event: Task) => {
-    const priorityColor = priorityColors[event.priority] || "#d1d5db";
-    return {
-      style: {
-        backgroundColor: priorityColor,
-        color: "white",
-        padding: "0px 5px",
-        border: "none",
-        fontSize: "0.75rem",
-      },
-    };
-  };
-
-  if (isLoading) return <div>Loading tasks...</div>;
-  if (error) return <div>Error loading tasks.</div>;
 
   return (
-    <div className="p-20 px-24 bg-blue-100 min-h-screen">
-      <DndProvider backend={HTML5Backend}>
-        <div className="bg-white shadow p-6" style={{ borderRadius: "20px" }}>
-          <DragAndDropCalendar
-            localizer={localizer}
-            events={calendarEvents}
-            startAccessor={(event) => event.start || new Date()}
-            endAccessor={(event) => event.end || new Date()}
-            style={{ height: 400 }}
-            onEventDrop={handleEventDrop}
-            resizable
-            onEventResize={handleEventResize}
-            eventPropGetter={eventStyleGetter}
-          />
-          <div className="mt-4">
-            <h3 className="text-sm font-semibold text-gray-600">Legend:</h3>
-            <ul className="flex gap-4 mt-2 text-sm">
-              <li className="flex items-center">
-                <span className="inline-block w-4 h-4 bg-red-500 mr-2"></span> High Priority
-              </li>
-              <li className="flex items-center">
-                <span className="inline-block w-4 h-4 bg-yellow-500 mr-2"></span> Medium Priority
-              </li>
-              <li className="flex items-center">
-                <span className="inline-block w-4 h-4 bg-green-500 mr-2"></span> Low Priority
-              </li>
-            </ul>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24">
+      <div className="w-full max-w-md bg-white p-6 shadow-lg rounded-lg">
+        <h2 className="text-xl font-semibold mb-4 text-center">Login</h2>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm">Email</label>
+            <input
+              type="email"
+              {...register("email", { required: "Email is required" })}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Enter your email"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm">Password</label>
+            <input
+              type="password"
+              {...register("password", { required: "Password is required" })}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Enter your password"
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+          {loginError && (
+            <p className="text-red-500 text-xs mb-4">{loginError}</p>
+          )}
+          <button
+            type="submit"
+            className={`w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+                Signing in...
+              </div>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+        </form>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-blue-600 hover:underline">
+              Register here
+            </Link>
+          </p>
+        </div>
+
+        <div className="mt-10 border-b text-center">
+          <div className="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
+            Or sign up with Google Account
           </div>
         </div>
-      </DndProvider>
+
+        <button
+          onClick={goToGoogle}
+          className="bg-white border py-2 w-full rounded-xl mt-6 flex justify-center items-center text-sm hover:scale-105 duration-300 hover:bg-[#60a8bc4f] font-medium"
+        >
+          <svg
+            className="mr-3"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 48 48"
+            width="25px"
+          >
+            <path
+              fill="#FFC107"
+              d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+            ></path>
+            <path
+              fill="#FF3D00"
+              d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+            ></path>
+            <path
+              fill="#4CAF50"
+              d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+            ></path>
+            <path
+              fill="#1976D2"
+              d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
+            ></path>
+          </svg>
+          Login with Google
+        </button>
+      </div>
     </div>
   );
 };
 
-export default DnDCalendar;
+export default Login;
