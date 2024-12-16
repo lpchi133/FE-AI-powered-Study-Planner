@@ -80,7 +80,7 @@ class AddTask extends React.Component<AddTaskProps, AddTaskState> {
             body: JSON.stringify(sendItem)
         };
 
-        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/users/createTask`, requestOptions)
+        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks/createTask`, requestOptions)
             .then((response) => {
                 if (response.status === 201) {
                     this.props.addnewtask(this.state.item);

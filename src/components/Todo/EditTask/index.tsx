@@ -70,7 +70,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             body: JSON.stringify(updateItem) 
         };
 
-        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/users/updateTask`, requestOptions)
+        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks/updateTask`, requestOptions)
             .then(response => {
                 if (response.status === 201) {
                     this.props.updateData();

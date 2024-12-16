@@ -92,7 +92,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
         }
     };
 
-    fetch(`${import.meta.env.VITE_ENDPOINT_URL}/users/tasks`, requestOptions)
+    fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks`, requestOptions)
     .then(response => response.json())
     .then(data => {
         
@@ -301,7 +301,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
             body: JSON.stringify(updateItem) 
         };
 
-        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/users/updateTask`, requestOptions)
+        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks/updateTask`, requestOptions)
         .then(response => {
           if(response.status !== 201) {
               alert("There was some problem with that. We're currently working on fixing it. Thank You.");
@@ -385,7 +385,7 @@ class ViewTasks extends Component<TodoProps, TodoState> {
             body: JSON.stringify(removeItem) 
         };
 
-        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/users/deleteTask`, requestOptions)
+        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks/deleteTask`, requestOptions)
         .then(response => {
           if(response.status === 201) {
             this.updateData();
