@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import GoogleUser from "./components/GoogleUser";
 import "react-toastify/dist/ReactToastify.css";
 import { Suspense, lazy } from 'react';
+import DnDCalendar from "./components/DnDCalendar";
 
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/" element={<ViewTasksWrapper isDark={false} />} /> 
+              <Route path="/calendar" element={<DnDCalendar/>} />
             </Route>
 
             <Route path="/register" element={<Register />} />

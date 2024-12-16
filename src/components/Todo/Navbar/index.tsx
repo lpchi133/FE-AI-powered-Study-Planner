@@ -121,7 +121,7 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
     }
 
     const bgLight = {
-      background: "#66b3ff",
+      background: "#93c5fd",
       color: "#555"
     }
 
