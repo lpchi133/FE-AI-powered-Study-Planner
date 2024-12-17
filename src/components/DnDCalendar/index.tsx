@@ -159,7 +159,7 @@ const DnDCalendar: React.FC = () => {
   if (error) return <div className="p-25">Error loading tasks.</div>;
 
   return (
-    <div className="p-20 px-24 bg-blue-100 min-h-screen">
+    <div className="p-20 px-24 bg-blue-300 min-h-screen">
       <DndProvider backend={HTML5Backend}>
         <div className="bg-white shadow p-6" style={{ borderRadius: "20px" }}>
           <DragAndDropCalendar

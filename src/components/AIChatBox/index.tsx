@@ -2,12 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/useAuth";
 import useAxios from "../../hooks/useAxios";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { convertToHtml } from './markdownToHtml';
 
 export default function AIChatBox() {
   const { user } = useAuth();
   const axiosInstance = useAxios();
-  const location = useLocation();
   const [text, setText] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false); // State to control the loading spinner when refresh is triggered
 
@@ -18,20 +17,14 @@ export default function AIChatBox() {
       const response = await axiosInstance.get(`/ai-suggestion`);
       return response.data;
     },
-    enabled: !!user?.id, // The query will only run if user ID exists
+    enabled: false, // Do not automatically fetch when the component is mounted
   });
-
-  // Trigger refetch when the route changes to /ai_chat_box
-  useEffect(() => {
-    if (location.pathname === "/ai_chat_box" && !!user?.id) {
-      refetch(); // Refetch data when the user navigates to this page
-    }
-  }, [location.pathname, user?.id, refetch]);
 
   // Update text state when data changes
   useEffect(() => {
     if (data) {
-      setText(data); // Set the new data to text state
+      const formattedText = convertToHtml(data); // Convert markdown to HTML
+      setText(formattedText); // Set the new data to text state
     }
   }, [data]);
 
@@ -44,8 +37,15 @@ export default function AIChatBox() {
     }
   };
 
+  // Handle page reload (triggered by browser reload or manual reload)
+  useEffect(() => {
+    if (user?.id) {
+      refetch(); // Fetch the data when the component mounts (if the user exists)
+    }
+  }, [user?.id, refetch]);
+
   return (
-    <div className="flex flex-col items-center mt-24 h-screen bg-gray-50">
+    <div className="flex flex-col items-center pt-24 min-h-screen bg-blue-300">
       <div className="bg-white shadow-lg rounded-lg p-6 max-w-3xl w-full">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
@@ -75,9 +75,10 @@ export default function AIChatBox() {
           </div>
         ) : (
           // Display fetched data
-          <div className="bg-gray-100 p-4 rounded-lg shadow-inner whitespace-pre-wrap text-gray-800 leading-relaxed">
-            {text || "No suggestions available at the moment."}
-          </div>
+          <div
+            className="bg-gray-100 p-4 rounded-lg shadow-inner text-gray-800 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: text || "No suggestions available at the moment." }}
+          />
         )}
       </div>
     </div>
