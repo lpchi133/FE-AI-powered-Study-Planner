@@ -50,7 +50,6 @@ const DnDCalendar: React.FC = () => {
         dateTimeSet: task.dateTimeSet ? new Date(task.dateTimeSet) : undefined,
         dueDateTime: task.dueDateTime ? new Date(task.dueDateTime) : undefined,
       }));
-      console.log("Mapped events:", events);
       setCalendarEvents(events);
       return data;
     },

@@ -7,9 +7,7 @@ const Profile = () => {
   const { logout, user, accessToken } = useAuth();
   const navigate = useNavigate();
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '/images/avt.jpg');
-  console.log("accessToken:", accessToken);
   if (!user) {
-    console.log("user", user);
     navigate("/");
   }
 
