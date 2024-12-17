@@ -13,7 +13,7 @@ export const convertToHtml = (text: string): string => {
     htmlText = htmlText.replace(/\n/g, "<p></p>");
     
     // Optional: Handle headers (e.g., # Header to <h1>)
-    htmlText = htmlText.replace(/^(#{1,6})\s*(.*?)$/gm, (match, hashes, title) => {
+    htmlText = htmlText.replace(/^(#{1,6})\s*(.*?)$/gm, (_match, hashes, title) => {
       const level = hashes.length; // Level of header
       return `<h${level}>${title}</h${level}>`; // Return corresponding header tag
     });
