@@ -9,6 +9,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faRedoAlt } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
+import { toast } from 'react-toastify';
 
 interface NavbarAboveProps {
   isDark: boolean;
@@ -58,7 +59,7 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
 
       if (daysDiff < 0) {
         this.setValidated(false);
-        alert("Select The Dates Properly.");
+        toast.error("Select The Dates Properly.");
       } else {
         this.setValidated(true);
       }
@@ -124,7 +125,7 @@ class NavbarAbove extends React.Component<NavbarAboveProps, NavbarAboveState> {
     }
 
     const bgLight = {
-      background: "#66b3ff",
+      background: "#93c5fd",
       color: "#555"
     }
 

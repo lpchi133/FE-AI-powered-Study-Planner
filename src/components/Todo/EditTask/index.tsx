@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { toast } from 'react-toastify';
 
 interface Task {
     id: string;
@@ -70,15 +71,15 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             body: JSON.stringify(updateItem) 
         };
 
-        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/users/updateTask`, requestOptions)
+        fetch(`${import.meta.env.VITE_ENDPOINT_URL}/tasks/updateTask`, requestOptions)
             .then(response => {
                 if (response.status === 201) {
                     this.props.updateData();
                     this.props.onHide();
                     // this.handleReset();
-                    alert('Task Edited.');
+                    toast.success('Task Edited.');
                 } else {
-                    alert("There was some problem with that. We're currently working on fixing it. Thank You.");
+                    toast.error("There was some problem with that. We're currently working on fixing it. Thank You.");
                 }
             });
     };
@@ -96,7 +97,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             event.stopPropagation();
             if (daysDiff < 0) {
                 this.setValidated(false);
-                alert("Select The Dates Properly.");
+                toast.error("Select The Dates Properly.");
             } else {
             this.setValidated(true);
             }
@@ -104,7 +105,7 @@ class EditTask extends React.Component<EditTaskProps, EditTaskState> {
             const nowDate = Date.now();
             const StartDate = new Date(this.state.item.start_date + ' ' + this.state.item.start_time);
             const dueDate = new Date(this.state.item.date + ' ' + this.state.item.time);
-            const daysDiff = (dueDate.getTime() - StartDate.getTime()) / (1000 * 3600 * 24);
+            const daysDiff = (dueDate.getTime() - nowDate) / (1000 * 3600 * 24);
             let val = 'Ongoing';
             
             // So sánh StartDate với nowDate
