@@ -9,6 +9,7 @@ interface User {
   name: string;
   email: string;
   profilePicture: string;
+  checkAccountGG: string;
 }
 
 interface AuthContextType {
