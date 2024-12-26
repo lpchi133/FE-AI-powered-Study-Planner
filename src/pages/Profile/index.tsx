@@ -2,9 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
 import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 
 const Profile = () => {
-  const { logout, user, accessToken } = useAuth();
+  const { logout, user } = useAuth();
+  const {post} =useAxios();
   const navigate = useNavigate();
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '/images/avt.jpg');
   if (!user) {
@@ -28,13 +30,10 @@ const Profile = () => {
       reader.readAsDataURL(file);
 
       try {
-        const response = await axios.post(`${import.meta.env.VITE_ENDPOINT_URL}/users/changeAvt`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-
+        const response = await post('/users/changeAvt', formData, {
+          'Content-Type': 'multipart/form-data',
+        });  
+      
         if (response.data.success) {
           // Thêm chuỗi truy vấn ngẫu nhiên để làm mới URL
           const profilePictureUrl = `${response.data.profilePictureUrl}?${new Date().getTime()}`;

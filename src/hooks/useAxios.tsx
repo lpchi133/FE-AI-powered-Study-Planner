@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useAuth } from "./useAuth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./useAuth";
 
 const useAxios = () => {
   const { accessToken, logout } = useAuth();
@@ -9,8 +9,18 @@ const useAxios = () => {
   const instance = axios.create({
     baseURL: import.meta.env.VITE_ENDPOINT_URL,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
     },
+  
+  });
+  
+  instance.interceptors.request.use((config) => {
+    // Do something before request is sent
+    config.headers.set('Authorization', `Bearer ${accessToken}`);
+    return config;
+  }, function (error) {
+    // Do something with request error
+    return Promise.reject(error);
   });
 
   // Interceptor to handle expired tokens
@@ -25,7 +35,44 @@ const useAxios = () => {
     }
   );
 
-  return instance;
+
+  const post= async (url: string, data:unknown , headers?:
+    object
+  ) => {
+    try {
+      const response = await instance.post(url, data,{
+        headers: {
+          ...(headers||{}),
+        }
+      });
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Error post", error);
+      throw error
+    }
+  }
+  const get= async (url: string, headers?: object) => {
+    try {
+      const response = await instance.get(url, {
+        headers: {
+          ...(headers||{}),
+        }
+      });
+      return response.data;
+    } catch (error: unknown) {
+      
+      console.error("Error get", error);
+      throw error
+
+    }
+  }
+
+
+  return {
+    instance,
+    post,
+    get
+  }
 };
 
 export default useAxios;

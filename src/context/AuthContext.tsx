@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
-// import useAxios from "../hooks/useAxios";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { User } from "../types/user";
 
-// Define context types
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  profilePicture: string;
-}
+
 
 interface AuthContextType {
   accessToken: string | null;

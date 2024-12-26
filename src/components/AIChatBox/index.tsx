@@ -6,16 +6,16 @@ import { convertToHtml } from './markdownToHtml';
 
 export default function AIChatBox() {
   const { user } = useAuth();
-  const axiosInstance = useAxios();
+  const {get} = useAxios();
   const [text, setText] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false); // State to control the loading spinner when refresh is triggered
 
   // Fetch AI suggestions with React Query
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
-    queryKey: ["ai-suggestion", user?.id], // Query key depends on user ID
+    queryKey: ["ai-suggestion"], // Query key depends on user ID
     queryFn: async () => {
-      const response = await axiosInstance.get(`/ai-suggestion`);
-      return response.data;
+      const response = await get(`/ai-suggestion`);
+      return response;
     },
     enabled: false, // Do not automatically fetch when the component is mounted
   });

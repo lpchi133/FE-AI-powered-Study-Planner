@@ -19,7 +19,7 @@ const Login = () => {
     formState: { errors },
   } = useForm<LoginData>();
   const { login, user } = useAuth(); // Add `user` from useAuth
-  const axiosInstance = useAxios();
+  const {post} = useAxios();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
@@ -34,7 +34,7 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: async (data: LoginData) => {
       setLoading(true);
-      const response = await axiosInstance.post("/auth/login", data);
+      const response = await post("/auth/login", data);
       return response.data;
     },
     onSuccess: (data) => {

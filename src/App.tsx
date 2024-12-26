@@ -1,44 +1,48 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Login from "./components/Login";
-import Profile from "./components/Profile";
-import { AuthProvider } from "./context/AuthContext";
+import { Suspense } from "react";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import Header from "./components/Header";
-import Register from "./components/Register";
-import ProtectedRoute from "./components/ProtectedRoute";
-import GoogleUser from "./components/GoogleUser";
 import "react-toastify/dist/ReactToastify.css";
-import { Suspense, lazy } from 'react';
-import DnDCalendar from "./components/DnDCalendar";
-
 import AIChatBox from "./components/AIChatBox";
+import DnDCalendar from "./components/DnDCalendar";
+import GoogleUser from "./components/GoogleUser";
+import Login from "./components/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Register from "./components/Register";
+import { AuthProvider } from "./context/AuthContext";
+import ModalControl from "./modals";
+import Todo from "./pages/NewTodo";
+import Profile from "./pages/Profile";
 
-const queryClient = new QueryClient();
-const ViewTasksWrapper = lazy(() => import('./components/Todo/ViewTasksWrapper'));
 
 function App() {
+  const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+
         <Router>
-          <Header />
+
           <Suspense fallback={<div>Loading...</div>}>
-          <Routes> 
-            <Route path="/login" element={<Login />} />
-            <Route path="/google/user/:token" element={<GoogleUser />} />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/google/user/:token" element={<GoogleUser />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/" element={<ViewTasksWrapper isDark={false} />} /> 
-              <Route path="/calendar" element={<DnDCalendar/>} />
-              <Route path="/ai_chat_box" element={<AIChatBox />} />
-            </Route>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/" element={<Todo />} />
+                <Route path="/calendar" element={<DnDCalendar />} />
+                <Route path="/ai_chat_box" element={<AIChatBox />} />
+              </Route>
 
-            <Route path="/register" element={<Register />} />
-          </Routes>
+              <Route path="/register" element={<Register />} />
+            </Routes>
+            <ModalControl/>
           </Suspense>
           <ToastContainer position="bottom-right" autoClose={3000} />
+
+
         </Router>
       </AuthProvider>
     </QueryClientProvider>

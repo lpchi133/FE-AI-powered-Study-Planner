@@ -1,18 +1,17 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import moment, { Moment } from "moment";
 import React, { useState } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop, {
   EventInteractionArgs,
 } from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import moment from "moment";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import useAxios from "../../hooks/useAxios";
-import { useAuth } from "../../hooks/useAuth";
-
-const DragAndDropCalendar = withDragAndDrop<Task>(Calendar);
+import useTasks from "../../hooks/useTasksContext";
+import { TaskPriority } from "../../types/task";
 
 interface Task {
   id: number;
@@ -20,77 +19,68 @@ interface Task {
   itemDescription: string;
   itemPriority: string;
   itemStatus: string;
-  dateTimeSet?: Date;
-  dueDateTime?: Date;
+  dateTimeSet?: Moment;
+  dueDateTime?: Moment;
 }
 
+const DragAndDropCalendar = withDragAndDrop<Task>(Calendar);
+
 const priorityColors: Record<string, string> = {
-  HIGH: "#ef4444",
-  MEDIUM: "#eab308",
-  LOW: "#22c55e",
+  [TaskPriority.High]: "#ef4444",
+  [TaskPriority.Medium]: "#eab308",
+  [TaskPriority.Low]: "#22c55e",
 };
 
 const DnDCalendar: React.FC = () => {
-  const { user } = useAuth();
-  const axiosInstance = useAxios();
+  const { post } = useAxios();
+  const { tasks } = useTasks();
   const queryClient = useQueryClient();
-  const [calendarEvents, setCalendarEvents] = useState<Task[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<Task[]>(
+    tasks.map((task) => ({
+      ...task,
+      dateTimeSet: moment(task.dateTimeSet),
+      dueDateTime: moment(task.dueDateTime),
+    }))
+  );
+  console.log("calendarEvents", calendarEvents, " tasks ", tasks);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-  // Fetch tasks
-  const { isLoading, error } = useQuery({
-    queryKey: ["tasks", user?.id],
-    queryFn: async () => {
-      const response = await axiosInstance.get(`/tasks`);
-      console.log("API response:", response.data);
-      const data = response.data as Task[];
-      const events = data.map((task) => ({
-        ...task,
-        dateTimeSet: task.dateTimeSet ? new Date(task.dateTimeSet) : undefined,
-        dueDateTime: task.dueDateTime ? new Date(task.dueDateTime) : undefined,
-      }));
-      setCalendarEvents(events);
-      return data;
-    },
-  });
 
   // Mutation to update a task
   const updateTaskMutation = useMutation({
     mutationFn: async (updatedTask: Task) => {
-      const response = await axiosInstance.post(`/tasks/updateTimeTask`, {
+      const response = await post(`/tasks/updateTimeTask`, {
         id: updatedTask.id,
-        start_date: updatedTask.dateTimeSet?.toISOString().split("T")[0],
-        date: updatedTask.dueDateTime?.toISOString().split("T")[0],
+        dateTimeSet: updatedTask.dateTimeSet?.toISOString().split("T")[0],
+        dueDateTime: updatedTask.dueDateTime?.toISOString().split("T")[0],
       });
       return response.data;
     },
     onSuccess: (updatedTask) => {
+      if (!updatedTask) return;
       // Optimistically update the calendar events
       setCalendarEvents((prevEvents) =>
         prevEvents.map((event) =>
-          event.id === updatedTask.id ? updatedTask : event
+          event.id === updatedTask?.id ? updatedTask : event
         )
       );
 
       // Optionally refetch tasks to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["tasks", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 
   const handleEventDrop = (args: EventInteractionArgs<Task>) => {
     // Get time from original task
-    const startHour = args.event.dateTimeSet?.getHours() || 0;
-    const startMinute = args.event.dateTimeSet?.getMinutes() || 0;
-    const endHour = args.event.dueDateTime?.getHours() || 0;
-    const endMinute = args.event.dueDateTime?.getMinutes() || 0;
+    const startHour = args.event.dateTimeSet?.hour() || 0;
+    const startMinute = args.event.dateTimeSet?.minute() || 0;
+    const endHour = args.event.dueDateTime?.hour() || 0;
+    const endMinute = args.event.dueDateTime?.minute() || 0;
 
     const updatedTask = {
       ...args.event,
-      dateTimeSet: new Date(
-        new Date(args.start).setHours(startHour, startMinute)
-      ),
-      dueDateTime: new Date(new Date(args.end).setHours(endHour, endMinute)),
+      dateTimeSet: moment(args.start).hour(startHour).minute(startMinute),
+      dueDateTime: moment(args.end).hour(endHour).minute(endMinute),
     };
 
     // Update state optimistically
@@ -106,25 +96,17 @@ const DnDCalendar: React.FC = () => {
 
   const handleEventResize = (args: EventInteractionArgs<Task>) => {
     // Get time from original task
-    const startHour = args.event.dateTimeSet?.getHours() || 0;
-    const startMinute = args.event.dateTimeSet?.getMinutes() || 0;
-    const endHour = args.event.dueDateTime?.getHours() || 0;
-    const endMinute = args.event.dueDateTime?.getMinutes() || 0;
+    // Get time from original task
+    const startHour = args.event.dateTimeSet?.hour() || 0;
+    const startMinute = args.event.dateTimeSet?.minute() || 0;
+    const endHour = args.event.dueDateTime?.hour() || 0;
+    const endMinute = args.event.dueDateTime?.minute() || 0;
 
     const updatedTask = {
       ...args.event,
-      dateTimeSet: new Date(
-        new Date(args.start).setHours(startHour, startMinute)
-      ),
-      dueDateTime: new Date(new Date(args.end).setHours(endHour, endMinute)),
+      dateTimeSet: moment(args.start).hour(startHour).minute(startMinute),
+      dueDateTime: moment(args.end).hour(endHour).minute(endMinute),
     };
-
-    // Update state optimistically
-    setCalendarEvents((prevEvents) =>
-      prevEvents.map((event) =>
-        event.id === updatedTask.id ? updatedTask : event
-      )
-    );
 
     // Send update to the server
     updateTaskMutation.mutate(updatedTask);
@@ -143,6 +125,7 @@ const DnDCalendar: React.FC = () => {
   const localizer = momentLocalizer(moment);
 
   const eventStyleGetter = (event: Task) => {
+    console.log("event", event);
     const priorityColor = priorityColors[event.itemPriority] || "#d1d5db";
     return {
       style: {
@@ -155,9 +138,6 @@ const DnDCalendar: React.FC = () => {
     };
   };
 
-  if (isLoading) return <div className="p-25">Loading tasks...</div>;
-  if (error) return <div className="p-25">Error loading tasks.</div>;
-
   return (
     <div className="p-20 px-24 bg-blue-300 min-h-screen">
       <DndProvider backend={HTML5Backend}>
@@ -165,8 +145,8 @@ const DnDCalendar: React.FC = () => {
           <DragAndDropCalendar
             localizer={localizer}
             events={calendarEvents}
-            startAccessor={(event) => event.dateTimeSet || new Date()}
-            endAccessor={(event) => event.dueDateTime || new Date()}
+            startAccessor={(event) => event.dateTimeSet?.toDate() || new Date()}
+            endAccessor={(event) => event.dueDateTime?.toDate() || new Date()}
             titleAccessor={(event) => event.itemLabel}
             style={{ height: 500 }}
             onEventDrop={handleEventDrop}

@@ -13,8 +13,8 @@ export default function Header() {
 
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-blue-600 py-3 px-4 shadow-md z-50">
-      <div className="container mx-auto flex justify-between items-center">
+    <header className="sticky top-0 left-0 w-full bg-blue-600 py-3 px-4 shadow-md z-50">
+      <div className=" mx-auto flex justify-between items-center">
         {/* Logo */}
         <div className="text-white font-bold text-lg">
           <Link to="/" className="text-white-important">
