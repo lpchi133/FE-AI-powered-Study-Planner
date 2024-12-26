@@ -19,7 +19,7 @@ const Login = () => {
     formState: { errors },
   } = useForm<LoginData>();
   const { login, user } = useAuth(); // Add `user` from useAuth
-  const {post} = useAxios();
+  const { post } = useAxios();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");

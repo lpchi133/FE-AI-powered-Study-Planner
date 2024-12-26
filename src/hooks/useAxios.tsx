@@ -9,19 +9,21 @@ const useAxios = () => {
   const instance = axios.create({
     baseURL: import.meta.env.VITE_ENDPOINT_URL,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-  
   });
-  
-  instance.interceptors.request.use((config) => {
-    // Do something before request is sent
-    config.headers.set('Authorization', `Bearer ${accessToken}`);
-    return config;
-  }, function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-  });
+
+  instance.interceptors.request.use(
+    (config) => {
+      // Do something before request is sent
+      config.headers.set("Authorization", `Bearer ${accessToken}`);
+      return config;
+    },
+    function (error) {
+      // Do something with request error
+      return Promise.reject(error);
+    }
+  );
 
   // Interceptor to handle expired tokens
   instance.interceptors.response.use(
@@ -35,44 +37,52 @@ const useAxios = () => {
     }
   );
 
-
-  const post= async (url: string, data:unknown , headers?:
-    object
-  ) => {
+  const post = async (url: string, data: unknown, headers?: object) => {
     try {
-      const response = await instance.post(url, data,{
+      const response = await instance.post(url, data, {
         headers: {
-          ...(headers||{}),
-        }
+          ...(headers || {}),
+        },
       });
       return response.data;
     } catch (error: unknown) {
       console.error("Error post", error);
-      throw error
+      throw error;
     }
-  }
-  const get= async (url: string, headers?: object) => {
+  };
+  const get = async (url: string, headers?: object) => {
     try {
       const response = await instance.get(url, {
         headers: {
-          ...(headers||{}),
-        }
+          ...(headers || {}),
+        },
       });
       return response.data;
     } catch (error: unknown) {
-      
       console.error("Error get", error);
-      throw error
-
+      throw error;
     }
-  }
-
+  };
+  const put = async (url: string, data: unknown, headers?: object) => {
+    try {
+      const response = await instance.put(url, data, {
+        headers: {
+          ...(headers || {}),
+        },
+      });
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Error post", error);
+      throw error;
+    }
+  };
 
   return {
     instance,
     post,
-    get
-  }
+    get,
+    put,
+  };
 };
 
 export default useAxios;

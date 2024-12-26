@@ -14,16 +14,13 @@ import ModalControl from "./modals";
 import Todo from "./pages/NewTodo";
 import Profile from "./pages/Profile";
 
-
 function App() {
   const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-
         <Router>
-
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -38,11 +35,9 @@ function App() {
 
               <Route path="/register" element={<Register />} />
             </Routes>
-            <ModalControl/>
+            <ModalControl />
           </Suspense>
           <ToastContainer position="bottom-right" autoClose={3000} />
-
-
         </Router>
       </AuthProvider>
     </QueryClientProvider>

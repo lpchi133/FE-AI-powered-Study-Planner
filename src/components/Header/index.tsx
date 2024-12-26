@@ -11,7 +11,6 @@ export default function Header() {
     navigate("/");
   };
 
-
   return (
     <header className="sticky top-0 left-0 w-full bg-blue-600 py-3 px-4 shadow-md z-50">
       <div className=" mx-auto flex justify-between items-center">

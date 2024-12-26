@@ -3,8 +3,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { User } from "../types/user";
 
-
-
 interface AuthContextType {
   accessToken: string | null;
   user: User | null;
@@ -40,7 +38,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         console.error("Error fetching user profile:", error);
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          logout(); 
+          logout();
           toast.error("Your session has expired. Please log in again.");
         }
       } finally {

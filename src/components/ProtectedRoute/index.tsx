@@ -14,14 +14,14 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" />;
   }
 
-  return <div >
-    
-    <Header />
-    <TaskProvider>
-    <Outlet />
-
-    </TaskProvider>
-  </div>
+  return (
+    <div>
+      <Header />
+      <TaskProvider>
+        <Outlet />
+      </TaskProvider>
+    </div>
+  );
 };
 
 export default ProtectedRoute;
