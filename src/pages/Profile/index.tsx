@@ -115,6 +115,24 @@ const Profile = () => {
       setPasswordError(
         "New password cannot be the same as the current password"
       );
+    }
+
+    if (
+      value != "" &&
+      name === "newPassword" &&
+      value === passwordFormData.currentPassword
+    ) {
+      setPasswordError(
+        "New password cannot be the same as the current password"
+      );
+    } else if (
+      value != "" &&
+      name === "currentPassword" &&
+      value === passwordFormData.newPassword
+    ) {
+      setPasswordError(
+        "New password cannot be the same as the current password"
+      );
     } else {
       setPasswordError("");
     }
