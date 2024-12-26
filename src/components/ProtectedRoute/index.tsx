@@ -16,7 +16,6 @@ const ProtectedRoute = () => {
 
   return (
     <div>
-      <Header />
       <TaskProvider>
         <Outlet />
       </TaskProvider>

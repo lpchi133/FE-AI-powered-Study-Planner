@@ -13,6 +13,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ModalControl from "./modals";
 import Todo from "./pages/NewTodo";
 import Profile from "./pages/Profile";
+import Header from "./components/Header";
 
 function App() {
   const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
+          <Header />
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>
               <Route path="/login" element={<Login />} />
