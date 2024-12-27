@@ -49,9 +49,9 @@ const Profile = () => {
           "Content-Type": "multipart/form-data",
         });
 
-        if (response.data.success) {
+        if (response?.success) {
           const profilePictureUrl = `${
-            response.data.profilePictureUrl
+            response.profilePictureUrl
           }?${new Date().getTime()}`;
           setProfilePicture(profilePictureUrl);
           fetchProfile();
@@ -156,7 +156,7 @@ const Profile = () => {
           newPassword: passwordFormData.newPassword,
         });
 
-        if (response.data.success) {
+        if (response?.success) {
           setIsPasswordModalOpen(false);
           alert("Change Password Successful!");
           fetchProfile();
@@ -185,19 +185,23 @@ const Profile = () => {
 
     try {
       const response = await put("/users/changePassword", passwordFormData);
-
-      if (response.data.success) {
+    
+    
+      // Kiểm tra `response.success` thay vì `response.data.success`
+      if (response?.success) {
         setIsPasswordModalOpen(false);
         alert("Change Password Successful!");
         fetchProfile();
         resetPasswordForm();
       } else {
-        console.error("Failed to change password");
+        console.error("Failed to change password. Response:", response);
+        setPasswordError("Failed to change password. Please try again.");
       }
     } catch (error) {
       console.error("Error changing password:", error);
       setPasswordError("Current password is incorrect");
     }
+    
   };
 
   return (
