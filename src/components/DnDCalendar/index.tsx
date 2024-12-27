@@ -151,7 +151,7 @@ const DnDCalendar: React.FC = () => {
   };
 
   return (
-    <div className="p-20 px-24 bg-blue-300 min-h-screen">
+    <div className="p-10 mt-12 px-24 bg-blue-300 min-h-screen">
       <DndProvider backend={HTML5Backend}>
         <div className="bg-white shadow p-6" style={{ borderRadius: "20px" }}>
           <DragAndDropCalendar

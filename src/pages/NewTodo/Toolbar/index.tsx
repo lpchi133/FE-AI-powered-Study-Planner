@@ -7,9 +7,8 @@ import "./index.css";
 import { useQueryClient } from "@tanstack/react-query";
 import useTasks, { SearchState } from "../../../hooks/useTasksContext";
 
-
 const Toolbar = () => {
-  const {setSearch} =useTasks();
+  const { setSearch } = useTasks();
   const queryClient = useQueryClient();
 
   const methods = useForm<SearchState>({
@@ -20,20 +19,20 @@ const Toolbar = () => {
     },
   });
 
-  const onRefresh=()=>{
+  const onRefresh = () => {
     queryClient.refetchQueries({
-      queryKey:["tasks"]
-    })
-  }
+      queryKey: ["tasks"],
+    });
+  };
 
-  const handleSubmit=(data:SearchState)=>{
-    console.log(data)
+  const handleSubmit = (data: SearchState) => {
+    console.log(data);
     setSearch(data);
-  }
-  
+  };
+
   return (
     <div>
-      <Navbar collapseOnSelect variant="dark" className="fixedTop-2 mx-auto">
+      <Navbar collapseOnSelect variant="dark" className="fixedTop-1 mx-auto">
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="nav-2 mx-auto">
@@ -46,7 +45,8 @@ const Toolbar = () => {
                     events.openModal(EventKeys.addTaskModal, {
                       id: 1,
                     })
-                  }>
+                  }
+                >
                   + Add Task
                 </Button>
               </Form.Group>
@@ -54,21 +54,31 @@ const Toolbar = () => {
               {/* Ô Search Tasks */}
               <Form.Group as={Col} lg="4" controlId="validationSearchTasks">
                 <InputGroup>
-                  <InputGroup.Text id="inputGroupSearchTasks">Search</InputGroup.Text>
-                  <Form.Control type="text" placeholder="Search tasks..." {...methods.register("title")} />
+                  <InputGroup.Text id="inputGroupSearchTasks">
+                    Search
+                  </InputGroup.Text>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search tasks..."
+                    {...methods.register("title")}
+                  />
                 </InputGroup>
               </Form.Group>
 
               {/* From Date */}
               <Form.Group as={Col} lg="2" controlId="validationFromDate">
                 <InputGroup>
-                  <InputGroup.Text id="inputGroupPrepend1">From</InputGroup.Text>
+                  <InputGroup.Text id="inputGroupPrepend1">
+                    From
+                  </InputGroup.Text>
                   <Form.Control
                     type="datetime-local"
                     {...methods.register("fromDate")}
                     aria-describedby="inputGroupPrepend1"
                   />
-                  <Form.Control.Feedback type="invalid">Please choose a proper date.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please choose a proper date.
+                  </Form.Control.Feedback>
                 </InputGroup>
               </Form.Group>
 
@@ -81,20 +91,30 @@ const Toolbar = () => {
                     {...methods.register("toDate")}
                     aria-describedby="inputGroupPrepend2"
                   />
-                  <Form.Control.Feedback type="invalid">Please choose a proper date.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please choose a proper date.
+                  </Form.Control.Feedback>
                 </InputGroup>
               </Form.Group>
 
               {/* Nút Submit */}
               <Form.Group as={Col} lg="1" controlId="validationSubmit">
-                <Button className="search-btn btn-block" variant="primary" type="submit">
+                <Button
+                  className="search-btn btn-block"
+                  variant="primary"
+                  type="submit"
+                >
                   <FontAwesomeIcon icon={faSearch} />
                 </Button>
               </Form.Group>
 
               {/* Nút Reset */}
               <Form.Group as={Col} lg="1" controlId="validationReset">
-                <Button className="search-btn btn-block" variant="danger" type="reset">
+                <Button
+                  className="search-btn btn-block"
+                  variant="danger"
+                  type="reset"
+                >
                   <FontAwesomeIcon icon={faRedoAlt} onCanPlay={onRefresh} />
                 </Button>
               </Form.Group>
