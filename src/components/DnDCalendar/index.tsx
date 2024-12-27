@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import moment, { Moment } from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop, {
   EventInteractionArgs,
@@ -35,16 +35,21 @@ const DnDCalendar: React.FC = () => {
   const { post } = useAxios();
   const { tasks } = useTasks();
   const queryClient = useQueryClient();
-  const [calendarEvents, setCalendarEvents] = useState<Task[]>(
-    tasks.map((task) => ({
-      ...task,
-      dateTimeSet: moment(task.dateTimeSet),
-      dueDateTime: moment(task.dueDateTime),
-    }))
-  );
-  console.log("calendarEvents", calendarEvents, " tasks ", tasks);
+  const [calendarEvents, setCalendarEvents] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  useEffect(() => {
+    if (tasks?.length) {
+      setCalendarEvents(
+        tasks.map((task) => ({
+          ...task,
+          dateTimeSet: moment(task.dateTimeSet),
+          dueDateTime: moment(task.dueDateTime),
+        }))
+      );
+    }
+  }, [tasks]);
 
   // Mutation to update a task
   const updateTaskMutation = useMutation({
@@ -107,6 +112,13 @@ const DnDCalendar: React.FC = () => {
       dateTimeSet: moment(args.start).hour(startHour).minute(startMinute),
       dueDateTime: moment(args.end).hour(endHour).minute(endMinute),
     };
+
+    // Optimistically update the calendar events
+    setCalendarEvents((prevEvents) =>
+      prevEvents.map((event) =>
+        event.id === updatedTask.id ? updatedTask : event
+      )
+    );
 
     // Send update to the server
     updateTaskMutation.mutate(updatedTask);
