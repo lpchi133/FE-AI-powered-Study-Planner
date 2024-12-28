@@ -37,11 +37,16 @@ const TaskItem = ({ taskId, isSelected, isDisabled, onToggle, isAllowEdit, isArc
     <tr className="active">
       <th className={isArchived || isSelected ? "strikeThrough" : ""} scope="row">
         <div>
-          <Form className="mb-3">
-            <Form.Group controlId="formBasicCheckbox">
-              <Form.Check disabled={isDisabled} type="checkbox" checked={isSelected} onChange={onToggle} />
-            </Form.Group>
-          </Form>
+        <Form className="mb-3">
+          <Form.Group controlId="formBasicCheckbox">
+            <Form.Check
+              disabled={isDisabled || isArchived} // Disable nếu isArchived = true hoặc isDisabled = true
+              type="checkbox"
+              checked={isArchived || isSelected} // Checkbox luôn được chọn nếu isArchived = true
+              onChange={!isArchived ? onToggle : undefined} // Vô hiệu hóa onChange khi isArchived = true
+            />
+          </Form.Group>
+        </Form>
         </div>
       </th>
       {isAllowEdit && (

@@ -5,7 +5,7 @@ import Toolbar from "../Toolbar";
 
 const ViewTasks = () => {
   const {getTaskIds} = useTasks();
-  const taskIds= getTaskIds();
+  const taskIds= getTaskIds(true);
   return (
     <div >
       <Toolbar />

@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import useTasks, { SearchState } from "../../../hooks/useTasksContext";
 
 const Toolbar = () => {
-  const { setSearch } = useTasks();
+  const { setSearch, resetSearch } = useTasks();
   const queryClient = useQueryClient();
 
   const methods = useForm<SearchState>({
@@ -20,10 +20,14 @@ const Toolbar = () => {
   });
 
   const onRefresh = () => {
-    queryClient.refetchQueries({
+    console.log("Invalidating tasks cache...");
+    queryClient.invalidateQueries({
       queryKey: ["tasks"],
     });
+    resetSearch(); // Đặt lại trạng thái tìm kiếm
+    methods.reset();
   };
+  
 
   const handleSubmit = (data: SearchState) => {
     console.log(data);
@@ -114,8 +118,9 @@ const Toolbar = () => {
                   className="search-btn btn-block"
                   variant="danger"
                   type="reset"
+                  onClick={onRefresh}
                 >
-                  <FontAwesomeIcon icon={faRedoAlt} onCanPlay={onRefresh} />
+                  <FontAwesomeIcon icon={faRedoAlt} />
                 </Button>
               </Form.Group>
             </Form>

@@ -6,7 +6,8 @@ import "./index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort, faSortDown, faSortUp } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import { TaskPriority, type Task } from "../../../types/task";
+import { TaskPriority, TaskStatus, type Task } from "../../../types/task";
+
 import moment from "moment";
 
 
@@ -22,7 +23,7 @@ type StateType = {
 };
 
 const TaskList = ({taskIds,isArchive,emptyCaption}:Props) => {
-  const {  getTaskMap } = useTasks();
+  const { getTaskMap, updateTask } = useTasks();
   const taskMap = getTaskMap();
   const [selectedIds, setSelectedId] = useState<number[]>([]);
   const [state, setState] = useState<StateType>({
@@ -114,13 +115,24 @@ const TaskList = ({taskIds,isArchive,emptyCaption}:Props) => {
     });
   };
 
-  const onToggleSelect = (id: number) => () => {
+  
+
+  const onToggleSelect = (id: number) => async () => {
     setSelectedId((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((_id) => id != _id);
-      } else return [...prev, id];
+      const isSelected = prev.includes(id);
+      const updatedSelectedIds = isSelected ? prev.filter((_id) => _id !== id) : [...prev, id];
+  
+      if (!isSelected) {
+        const taskToUpdate = taskMap[id];
+        if (taskToUpdate) {
+          updateTask(id, { itemStatus: TaskStatus.Completed });
+        }
+      }
+  
+      return updatedSelectedIds;
     });
   };
+  
   taskIds.sort(compareValues(state.currentSort,state.sortType[state.currentSort]))
   return (
     <div className={!isArchive ?"todo-table":""}>
@@ -171,7 +183,7 @@ const TaskList = ({taskIds,isArchive,emptyCaption}:Props) => {
           </thead>
           <tbody>
             {taskIds.map((id) => {
-              return <TaskItem key={id} taskId={id} isSelected={selectedIds.includes(id)} onToggle={onToggleSelect(id)}  isAllowEdit={!isArchive}/>;
+              return <TaskItem key={id} taskId={id} isSelected={selectedIds.includes(id)} onToggle={onToggleSelect(id)}  isAllowEdit={!isArchive} isArchived={isArchive}/>;
             })}
           </tbody>
         </table>

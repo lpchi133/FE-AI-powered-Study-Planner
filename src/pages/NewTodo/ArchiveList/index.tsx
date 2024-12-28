@@ -9,12 +9,12 @@ import "./index.css";
 const ArchiveList = () => {
     const {getCompleteTaskIds} = useTasks();
 
-    const [isOpen,setIsOpen] =useState(false );
+    const [isOpen,setIsOpen] =useState(true );
 
     const toggleAccordion=()=> {setIsOpen((prev)=>!prev)}
     const  completeTaskIds=getCompleteTaskIds();
 
-
+    // console.log("Complete Task IDs:", completeTaskIds);
   return (
       <Accordion 
              
@@ -29,9 +29,17 @@ const ArchiveList = () => {
                             </div>
                     </Card.Header>
                     <Accordion.Collapse eventKey="0">
-                        <Card.Body>
-                               <TaskList taskIds={completeTaskIds} isArchive={true} emptyCaption={()=>( <h6 className="text-center no-tasks-message">Complete tasks to see them here.</h6>)} />
-                        </Card.Body>
+                    <Card.Body>
+                        <TaskList
+                        taskIds={completeTaskIds}
+                        isArchive={true}
+                        emptyCaption={() => (
+                            <h6 className="text-center no-tasks-message">
+                            Complete tasks to see them here.
+                            </h6>
+                        )}
+                        />
+                    </Card.Body>
                     </Accordion.Collapse>
                 </Card>
             </Accordion>

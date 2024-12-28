@@ -77,7 +77,7 @@ const Profile = () => {
     try {
       const response = await put("/users/update", editFormData);
 
-      if (response.data.success) {
+      if (response?.success) {
         // Update user data in the state
         // Assuming you have a method to update user data in your auth context
         // updateUser(response.data.user);

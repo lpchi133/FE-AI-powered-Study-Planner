@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Col, Modal, Row } from "react-bootstrap";
+import { Col, Modal, Row, Button } from "react-bootstrap";
 import useAxios from "../../hooks/useAxios";
 import useModalControl from "../../hooks/useModalControl";
 import { type Task } from "../../types/task";
@@ -7,74 +7,72 @@ import { EventKeys } from "../../utils/eventBus";
 import { toast } from "react-toastify";
 
 export type DeleteTaskModalProps = {
-    task:Task
+    task: Task;
 };
 
-
 const DeleteTaskModal = () => {
-    const {post } =useAxios();
-  const queryClient = useQueryClient();
-  const { isOpen, close,payload} = useModalControl(EventKeys.deleteTaskModal,{
-    onOpen(payload) {
-      console.log("open")
-      const task=payload?.task
-      console.log("task",task)
-      if(!task) {
+    const { post } = useAxios();
+    const queryClient = useQueryClient();
+    const { isOpen, close, payload } = useModalControl(EventKeys.deleteTaskModal, {
+        onOpen(payload) {
+            console.log("open");
+            const task = payload?.task;
+            console.log("task", task);
+            if (!task) {
+                close();
+                return;
+            }
+        },
+    });
+
+    const onClose = () => {
         close();
-        return;
-      }
-    },
-  });
+    };
 
+    const onConfirm = () => {
+        console.log("delete ");
+        post("/tasks/deleteTask", {
+            id: payload?.task.id
+        }).then(() => {
+            toast.success("Task deleted successfully");
+            queryClient.refetchQueries({
+                queryKey: ['tasks']
+            }).catch(() => {
+                toast.error("Failed to delete task");
+            }).finally(() => {
+                onCancel();
+            });
+        });
+    };
 
-  const onClose = () => {
-    close();
-  };
+    const onCancel = () => {
+        onClose();
+    };
 
-  const onConfirm =()=>{
-    console.log("delete ")
-    post("/tasks/deleteTask",{
-        id:payload?.task.id
-    }).then(()=>{
-          toast.success("Task delete successfully");
- queryClient.refetchQueries({
-        queryKey:['tasks']
-    }).catch(()=>{
-        toast.error("Task delete successfully")
-    }).finally(()=>{
-      onCancel();
-    })
-
-    })
-   
-  }
-
-  const onCancel=()=>{
-    onClose();
-  }
-
-  return (
-      <Modal show={isOpen} onHide={onClose} size="lg" centered>
-        <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">Delete Task</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-            <Row>
-            Are you sure to delete task {payload?.task.itemLabel}?
-
-            </Row>
-              <Col>
-                <button className="btn btn-secondary btn-lg" type="reset" id="reset-btn" onClick={onCancel}>
-                  Cancel
-                </button>
-                 <button className="btn btn-danger btn-lg" type="submit" id="add-btn" onClick={onConfirm}>
-                  Delete
-                </button>
-            </Col>
-            
-        </Modal.Body>
-      </Modal>
-  );
+    return (
+        <Modal show={isOpen} onHide={onClose} size="lg" centered>
+            <Modal.Header closeButton>
+                <Modal.Title id="contained-modal-title-vcenter">Delete Task</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Row>
+                    <Col>
+                        Are you sure you want to delete the task "{payload?.task.itemLabel}"?
+                    </Col>
+                </Row>
+                <Row className="mt-3">
+                    <Col className="d-flex justify-content-between">
+                        <Button variant="secondary" onClick={onCancel}>
+                            Cancel
+                        </Button>
+                        <Button variant="danger" onClick={onConfirm}>
+                            Delete
+                        </Button>
+                    </Col>
+                </Row>
+            </Modal.Body>
+        </Modal>
+    );
 };
 
 export default DeleteTaskModal;
