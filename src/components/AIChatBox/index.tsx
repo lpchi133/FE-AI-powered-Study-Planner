@@ -2,20 +2,20 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/useAuth";
 import useAxios from "../../hooks/useAxios";
 import { useState, useEffect } from "react";
-import { convertToHtml } from './markdownToHtml';
+import { convertToHtml } from "./markdownToHtml";
 
 export default function AIChatBox() {
   const { user } = useAuth();
-  const axiosInstance = useAxios();
+  const { get } = useAxios();
   const [text, setText] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false); // State to control the loading spinner when refresh is triggered
 
   // Fetch AI suggestions with React Query
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
-    queryKey: ["ai-suggestion", user?.id], // Query key depends on user ID
+    queryKey: ["ai-suggestion"], // Query key depends on user ID
     queryFn: async () => {
-      const response = await axiosInstance.get(`/ai-suggestion`);
-      return response.data;
+      const response = await get(`/ai-suggestion`);
+      return response;
     },
     enabled: false, // Do not automatically fetch when the component is mounted
   });
@@ -49,7 +49,9 @@ export default function AIChatBox() {
       <div className="bg-white shadow-lg rounded-lg p-6 max-w-3xl w-full">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <div className="text-2xl font-bold text-blue-600">✨ AI-powered Suggestions</div>
+          <div className="text-2xl font-bold text-blue-600">
+            ✨ AI-powered Suggestions
+          </div>
           <button
             onClick={handleRefresh} // Trigger refresh on button click
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md transition duration-300"
@@ -77,7 +79,9 @@ export default function AIChatBox() {
           // Display fetched data
           <div
             className="bg-gray-100 p-4 rounded-lg shadow-inner text-gray-800 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: text || "No suggestions available at the moment." }}
+            dangerouslySetInnerHTML={{
+              __html: text || "No suggestions available at the moment.",
+            }}
           />
         )}
       </div>

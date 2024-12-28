@@ -19,7 +19,7 @@ const Login = () => {
     formState: { errors },
   } = useForm<LoginData>();
   const { login, user } = useAuth(); // Add `user` from useAuth
-  const axiosInstance = useAxios();
+  const { post } = useAxios();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
@@ -34,13 +34,13 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: async (data: LoginData) => {
       setLoading(true);
-      const response = await axiosInstance.post("/auth/login", data);
-      return response.data;
+      const response = await post("/auth/login", data);
+      return response;
     },
     onSuccess: (data) => {
       login(data.accessToken);
-      toast.success("Login successful!");
       navigate("/");
+      toast.success("Login successful!");
     },
     onError: (error: { response: { data: { message: string } } }) => {
       setLoginError(
@@ -62,7 +62,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-16">
       <div className="w-full max-w-md bg-white p-6 shadow-lg rounded-lg">
         <h2 className="text-xl font-semibold mb-4 text-center">Login</h2>
         <form onSubmit={handleSubmit(onSubmit)}>

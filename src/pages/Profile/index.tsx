@@ -1,61 +1,65 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
-import axios from "axios";
+import useAxios from "../../hooks/useAxios";
 
 const Profile = () => {
-  const { logout, user, accessToken, fetchProfile } = useAuth();
+  const { logout, user, fetchProfile } = useAuth();
+  const { post, put } = useAxios();
   const navigate = useNavigate();
-  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '/images/avt.jpg');
+  const [profilePicture, setProfilePicture] = useState(
+    user?.profilePicture || "/images/avt.jpg"
+  );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
+    name: user?.name || "",
+    email: user?.email || "",
   });
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [passwordFormData, setPasswordFormData] = useState({
-    currentPassword: '',
-    newPassword: '',
+    currentPassword: "",
+    newPassword: "",
   });
-  const [passwordError, setPasswordError] = useState('');
+  const [passwordError, setPasswordError] = useState("");
 
   if (!user) {
     navigate("/");
     return null;
-  } 
+  }
 
-  const handleProfilePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       const formData = new FormData();
-      formData.append('profilePicture', file);
+      formData.append("profilePicture", file);
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (reader.result && typeof reader.result === 'string') {
+        if (reader.result && typeof reader.result === "string") {
           setProfilePicture(reader.result);
         }
       };
       reader.readAsDataURL(file);
 
       try {
-        const response = await axios.post(`${import.meta.env.VITE_ENDPOINT_URL}/users/changeAvt`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${accessToken}`,
-          },
+        const response = await post("/users/changeAvt", formData, {
+          "Content-Type": "multipart/form-data",
         });
 
-        if (response.data.success) {
-          const profilePictureUrl = `${response.data.profilePictureUrl}?${new Date().getTime()}`;
+        if (response?.success) {
+          const profilePictureUrl = `${
+            response.profilePictureUrl
+          }?${new Date().getTime()}`;
           setProfilePicture(profilePictureUrl);
           fetchProfile();
         } else {
-          console.error('Failed to update profile picture');
+          console.error("Failed to update profile picture");
         }
       } catch (error) {
-        console.error('Error uploading profile picture:', error);
+        console.error("Error uploading profile picture:", error);
       }
     }
   };
@@ -71,13 +75,9 @@ const Profile = () => {
   const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await axios.put(`${import.meta.env.VITE_ENDPOINT_URL}/users/update`, editFormData, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
-  
-      if (response.data.success) {
+      const response = await put("/users/update", editFormData);
+
+      if (response?.success) {
         // Update user data in the state
         // Assuming you have a method to update user data in your auth context
         // updateUser(response.data.user);
@@ -85,10 +85,10 @@ const Profile = () => {
         // setPasswordFormData('', '');
         fetchProfile();
       } else {
-        console.error('Failed to update user data');
+        console.error("Failed to update user data");
       }
     } catch (error) {
-      console.error('Error updating user data:', error);
+      console.error("Error updating user data:", error);
     }
   };
 
@@ -98,74 +98,110 @@ const Profile = () => {
       ...prevData,
       [name]: value,
     }));
-  
-    if (value != '' && name === 'newPassword' && value === passwordFormData.currentPassword) {
-      setPasswordError('New password cannot be the same as the current password');
-    } else if (value != '' && name === 'currentPassword' && value === passwordFormData.newPassword) {
-      setPasswordError('New password cannot be the same as the current password');
+
+    if (
+      value != "" &&
+      name === "newPassword" &&
+      value === passwordFormData.currentPassword
+    ) {
+      setPasswordError(
+        "New password cannot be the same as the current password"
+      );
+    } else if (
+      value != "" &&
+      name === "currentPassword" &&
+      value === passwordFormData.newPassword
+    ) {
+      setPasswordError(
+        "New password cannot be the same as the current password"
+      );
+    }
+
+    if (
+      value != "" &&
+      name === "newPassword" &&
+      value === passwordFormData.currentPassword
+    ) {
+      setPasswordError(
+        "New password cannot be the same as the current password"
+      );
+    } else if (
+      value != "" &&
+      name === "currentPassword" &&
+      value === passwordFormData.newPassword
+    ) {
+      setPasswordError(
+        "New password cannot be the same as the current password"
+      );
     } else {
-      setPasswordError('');
+      setPasswordError("");
     }
   };
 
   const resetPasswordForm = () => {
     setPasswordFormData({
-      currentPassword: '',
-      newPassword: '',
+      currentPassword: "",
+      newPassword: "",
     });
-    setPasswordError('');
+    setPasswordError("");
   };
-  
-  
-  const handlePasswordChangeSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+
+  const handlePasswordChangeSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
-    if (user.checkAccountGG === 'yes') {
+    if (user.checkAccountGG) {
       try {
-        const response = await axios.put(`${import.meta.env.VITE_ENDPOINT_URL}/users/changePassword`, { newPassword: passwordFormData.newPassword }, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
+        const response = await put("/users/changePassword", {
+          newPassword: passwordFormData.newPassword,
         });
-  
-        if (response.data.success) {
+
+        if (response?.success) {
           setIsPasswordModalOpen(false);
-          alert('Change Password Successful!');
+          alert("Change Password Successful!");
           fetchProfile();
           resetPasswordForm();
         } else {
-          setPasswordError(response.data.message || 'Failed to change password');
+          setPasswordError(
+            response.data.message || "Failed to change password"
+          );
         }
       } catch (error) {
-        console.error('Error changing password', error);
-        setPasswordError('Error changing password');
+        console.error("Error changing password", error);
+        setPasswordError("Error changing password");
       }
       return;
     }
-  
-    if (passwordFormData.currentPassword != '' && passwordFormData.currentPassword === passwordFormData.newPassword) {
-      setPasswordError('New password cannot be the same as the current password');
+
+    if (
+      passwordFormData.currentPassword != "" &&
+      passwordFormData.currentPassword === passwordFormData.newPassword
+    ) {
+      setPasswordError(
+        "New password cannot be the same as the current password"
+      );
       return;
     }
-  
+
     try {
-      const response = await axios.put(`${import.meta.env.VITE_ENDPOINT_URL}/users/changePassword`, passwordFormData, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
-  
-      if (response.data.success) {
+      const response = await put("/users/changePassword", passwordFormData);
+    
+    
+      // Kiểm tra `response.success` thay vì `response.data.success`
+      if (response?.success) {
         setIsPasswordModalOpen(false);
-        alert('Change Password Successful!');
+        alert("Change Password Successful!");
         fetchProfile();
         resetPasswordForm();
       } else {
-        console.error('Failed to change password');
+        console.error("Failed to change password. Response:", response);
+        setPasswordError("Failed to change password. Please try again.");
       }
     } catch (error) {
-      console.error('Error changing password:', error);
-      setPasswordError('Current password is incorrect');
+      console.error("Error changing password:", error);
+      setPasswordError("Current password is incorrect");
     }
+    
   };
 
   return (
@@ -198,21 +234,21 @@ const Profile = () => {
             <p className="text-gray-700">{user.email}</p>
           </div>
           <div className="mb-4">
-            <div 
+            <div
               className="flex items-center justify-between text-gray-700 cursor-pointer hover:text-blue-600 font-semibold text-lg"
               onClick={() => setIsPasswordModalOpen(true)}
             >
               <span>Change Password</span>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 text-gray-500" 
-                viewBox="0 0 26 26" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-500"
+                viewBox="0 0 26 26"
                 fill="currentColor"
               >
-                <path 
-                  fillRule="evenodd" 
+                <path
+                  fillRule="evenodd"
                   d="M7.247 4.341a1 1 0 0 1 1.412-.094l8 7a1 1 0 0 1 0 1.506l-8 7a1 1 0 0 1-1.318-1.506L14.482 12l-7.14-6.247a1 1 0 0 1-.094-1.412z"
-                  clipRule="evenodd" 
+                  clipRule="evenodd"
                 />
               </svg>
             </div>
@@ -249,7 +285,10 @@ const Profile = () => {
             <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
             <form onSubmit={handleEditSubmit}>
               <div className="mb-4">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Full Name
                 </label>
                 <input
@@ -262,7 +301,10 @@ const Profile = () => {
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Email
                 </label>
                 <input
@@ -301,13 +343,14 @@ const Profile = () => {
             <h2 className="text-2xl font-bold mb-4">Change Password</h2>
             <form onSubmit={handlePasswordChangeSubmit}>
               {passwordError && (
-                <div className="mb-4 text-red-600">
-                  {passwordError}
-                </div>
+                <div className="mb-4 text-red-600">{passwordError}</div>
               )}
-              {user.checkAccountGG !== 'yes' && (
+              {!user.checkAccountGG && (
                 <div className="mb-4">
-                  <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="currentPassword"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Current Password
                   </label>
                   <input
@@ -321,7 +364,10 @@ const Profile = () => {
                 </div>
               )}
               <div className="mb-4">
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="newPassword"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   New Password
                 </label>
                 <input
@@ -334,16 +380,16 @@ const Profile = () => {
                 />
               </div>
               <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsPasswordModalOpen(false);
-                  resetPasswordForm();
-                }}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition duration-300"
-              >
-                Cancel
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsPasswordModalOpen(false);
+                    resetPasswordForm();
+                  }}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition duration-300"
+                >
+                  Cancel
+                </button>
 
                 <button
                   type="submit"
@@ -356,7 +402,6 @@ const Profile = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

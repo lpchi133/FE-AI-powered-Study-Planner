@@ -1,7 +1,7 @@
-import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAxios from "../../hooks/useAxios";
@@ -13,16 +13,20 @@ interface RegisterData {
 }
 
 const Register = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterData>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterData>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [registerError, setRegisterError] = useState("");
-  const axiosInstance = useAxios();
+  const { post } = useAxios();
 
   const mutation = useMutation({
     mutationFn: async (data: RegisterData) => {
       setLoading(true);
-      const response = await axiosInstance.post("/auth/register",data);
+      const response = await post("/auth/register", data);
       return response.data;
     },
     onSuccess: () => {
@@ -30,7 +34,9 @@ const Register = () => {
       navigate("/login");
     },
     onError: (error: { response: { data: { message: string } } }) => {
-      setRegisterError(error.response.data.message || "Something went wrong. Please try again.");
+      setRegisterError(
+        error.response.data.message || "Something went wrong. Please try again."
+      );
     },
     onSettled: () => {
       setLoading(false);
@@ -38,20 +44,22 @@ const Register = () => {
   });
 
   const onSubmit = (data: RegisterData) => {
-    setRegisterError('');
+    setRegisterError("");
     mutation.mutate(data);
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-16">
       <div className="w-full max-w-md bg-white p-6 shadow-lg rounded-lg">
         <h2 className="text-xl font-semibold mb-4 text-center">Register</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm">Full Name</label>
+            <label htmlFor="name" className="block text-gray-700 text-sm">
+              Full Name
+            </label>
             <input
               type="text"
-              {...register('name', { required: 'Full name is required' })}
+              {...register("name", { required: "Full name is required" })}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Enter your full name"
             />
@@ -60,27 +68,35 @@ const Register = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm">Email</label>
+            <label htmlFor="email" className="block text-gray-700 text-sm">
+              Email
+            </label>
             <input
               type="email"
-              {...register('email', { required: 'Email is required' })}
+              {...register("email", { required: "Email is required" })}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Enter your email"
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
             )}
           </div>
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm">Password</label>
+            <label htmlFor="password" className="block text-gray-700 text-sm">
+              Password
+            </label>
             <input
               type="password"
-              {...register('password', { required: 'Password is required' })}
+              {...register("password", { required: "Password is required" })}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Create a password"
             />
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
             )}
           </div>
           {registerError && (
@@ -89,7 +105,7 @@ const Register = () => {
           <button
             type="submit"
             className={`w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
+              loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={loading}
           >
@@ -101,6 +117,7 @@ const Register = () => {
                   fill="none"
                   viewBox="0 0 24 24"
                 >
+                  <title>hehe</title>
                   <circle
                     className="opacity-25"
                     cx="12"
@@ -108,24 +125,24 @@ const Register = () => {
                     r="10"
                     stroke="currentColor"
                     strokeWidth="4"
-                  ></circle>
+                  />
                   <path
                     className="opacity-75"
                     fill="currentColor"
                     d="M4 12a8 8 0 018-8v8H4z"
-                  ></path>
+                  />
                 </svg>
                 Registering...
               </div>
             ) : (
-              'Sign Up'
+              "Sign Up"
             )}
           </button>
         </form>
 
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link to="/login" className="text-blue-600 hover:underline">
               Login here
             </Link>
