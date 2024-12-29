@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AIChatBox from "./components/AIChatBox";
 import DnDCalendar from "./components/DnDCalendar";
 import GoogleUser from "./components/GoogleUser";
+import Analytics from "./components/Analytics";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./components/Register";
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/" element={<Todo />} />
                 <Route path="/calendar" element={<DnDCalendar />} />
                 <Route path="/ai_chat_box" element={<AIChatBox />} />
+                <Route path="/analytics" element={<Analytics />} />
               </Route>
 
               <Route path="/register" element={<Register />} />
