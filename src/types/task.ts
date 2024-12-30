@@ -8,6 +8,17 @@ export type Task = {
 	itemPriority: TaskPriority;
 	itemStatus: TaskStatus;
 	userId: number;
+	focusSessions: FocusSession[];
+	focusTime: number | null;
+	breakTime: number | null;
+};
+
+export type FocusSession = {
+	id: number;
+	taskId: number;
+	duration: number;  // Session duration in minutes
+	startedAt: string; // ISO string for startedAt
+	endedAt: string | null; // ISO string or null for endedAt
 };
 
 export enum TaskPriority {

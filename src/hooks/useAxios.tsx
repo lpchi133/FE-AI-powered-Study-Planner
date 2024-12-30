@@ -76,12 +76,41 @@ const useAxios = () => {
       throw error;
     }
   };
+  const patch = async (url: string, data: unknown, headers?: object) => {
+    try {
+      const response = await instance.patch(url, data, {
+        headers: {
+          ...(headers || {}),
+        },
+      });
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Error patch", error);
+      throw error;
+    }
+  };
+  const deleteReq = async (url: string, data: unknown, headers?: object) => {
+    try {
+      const response = await instance.delete(url, {
+        data,
+        headers: {
+          ...(headers || {}),
+        },
+      });
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Error delete", error);
+      throw error;
+    }
+  };
 
   return {
     instance,
     post,
     get,
     put,
+    patch,
+    deleteReq,
   };
 };
 
