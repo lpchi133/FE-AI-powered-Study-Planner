@@ -8,7 +8,6 @@ export type Task = {
 	itemPriority: TaskPriority;
 	itemStatus: TaskStatus;
 	userId: number;
-	focusSessions: FocusSession[];
 	focusTime: number | null;
 	breakTime: number | null;
 };
