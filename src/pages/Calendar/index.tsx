@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import moment, { Moment } from "moment";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import withDragAndDrop, {
@@ -12,6 +12,9 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import useAxios from "../../hooks/useAxios";
 import useTasks from "../../hooks/useTasksContext";
 import { Task, TaskPriority } from "../../types/task";
+import FocusBreakTimer from "../../components/FocusBreakTimer";
+import { useTimer } from "../../hooks/useTimerContext";
+import { toast } from "react-toastify";
 
 const DragAndDropCalendar = withDragAndDrop<Task>(Calendar);
 
@@ -22,16 +25,13 @@ const priorityColors: Record<string, string> = {
 };
 
 const DnDCalendar: React.FC = () => {
-  const { post, patch, deleteReq } = useAxios();
+  const { post } = useAxios();
   const { tasks } = useTasks();
+  const { isFinish, handleFinish } = useTimer();
   const queryClient = useQueryClient();
   const [calendarEvents, setCalendarEvents] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [timerDuration, setTimerDuration] = useState<number>(0);
-  const [breakDuration, setBreakDuration] = useState<number>(0);
-  const [focusSessionId, setFocusSessionId] = useState<number | null>(null);
 
   useEffect(() => {
     if (tasks?.length) {
@@ -58,6 +58,9 @@ const DnDCalendar: React.FC = () => {
       return response.data;
     },
     onSuccess: (updatedTask) => {
+      // Optionally refetch tasks to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+
       if (!updatedTask) return;
       // Optimistically update the calendar events
       setCalendarEvents((prevEvents) =>
@@ -65,46 +68,6 @@ const DnDCalendar: React.FC = () => {
           event.id === updatedTask?.id ? updatedTask : event
         )
       );
-
-      // Optionally refetch tasks to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    },
-  });
-
-  const startTimerMutation = useMutation({
-    mutationFn: async (taskId: number) => {
-      const response = await post(`/focus-timer/${taskId}/start`, {
-        duration: timerDuration,
-      });
-      return response.data;
-    },
-    onSuccess: (data) => {
-      setFocusSessionId(data.id);
-      setIsTimerRunning(true);
-    },
-  });
-
-  const endTimerMutation = useMutation({
-    mutationFn: async (sessionId: number) => {
-      const response = await patch(`/focus-timer/${sessionId}/end`, {});
-      return response.data;
-    },
-    onSuccess: (data) => {
-      setIsTimerRunning(false);
-      setFocusSessionId(null);
-      alert("Focus session ended. " + data.timeSpent + " minutes completed.");
-    },
-  });
-
-  const cancelTimerMutation = useMutation({
-    mutationFn: async (timerId: number) => {
-      const response = await deleteReq(`/focus-timer/cancel`, { timerId });
-      return response.data;
-    },
-    onSuccess: () => {
-      setIsTimerRunning(false);
-      setFocusSessionId(null);
-      alert("Timer canceled.");
     },
   });
 
@@ -182,22 +145,45 @@ const DnDCalendar: React.FC = () => {
 
   const handleSelectEvent = (task: Task) => {
     setSelectedTask(task);
-    setIsPopupOpen(true);
-    setTimerDuration(task.focusTime ? task.focusTime : 25); // Reset focus time duration to default value
-    setBreakDuration(task.breakTime ? task.breakTime : 5); // Reset break time to default value
-    setIsTimerRunning(false);
+    handleFinish();
   };
 
   const handleClosePopup = () => {
-    setIsPopupOpen(false);
-    setSelectedTask(null);
-    setIsTimerRunning(false);
+    if (isFinish) {
+      setSelectedTask(null);
+      setIsTimerRunning(false);
+    } else {
+      toast.error("Please finish the current session!");
+    }
+  };
+
+  const handleFocusTimeChange = (time: number) => {
+    if (selectedTask && isFinish) {
+      setSelectedTask((prevTask) => {
+        if (!prevTask) return prevTask;
+        return {
+          ...prevTask,
+          focusTime: time,
+        };
+      });
+    }
+  };
+
+  const handleBreakTimeChange = (time: number) => {
+    if (selectedTask && isFinish) {
+      setSelectedTask((prevTask) => {
+        if (!prevTask) return prevTask;
+        return {
+          ...prevTask,
+          breakTime: time,
+        };
+      });
+    }
   };
 
   const localizer = momentLocalizer(moment);
 
   const eventStyleGetter = (event: Task) => {
-    console.log("event", event);
     const priorityColor = priorityColors[event.itemPriority] || "#d1d5db";
     return {
       style: {
@@ -210,33 +196,19 @@ const DnDCalendar: React.FC = () => {
     };
   };
 
-  const handleStartFocusTimer = () => {
-    if (selectedTask) {
-      startTimerMutation.mutate(selectedTask.id);
-    }
-  };
-
-  const handleEndFocusTimer = () => {
-    if (focusSessionId) {
-      endTimerMutation.mutate(focusSessionId);
-    }
-  };
-
-  const handleCancelFocusTimer = () => {
-    if (focusSessionId) {
-      cancelTimerMutation.mutate(focusSessionId);
-    }
-  };
-
   return (
-    <div className="p-10 mt-12 px-24 bg-blue-300 min-h-screen">
+    <div className="p-16 mt-8 bg-blue-300 min-h-screen">
       <DndProvider backend={HTML5Backend}>
-        <div className="bg-white shadow p-6" style={{ borderRadius: "20px" }}>
+        <div className="bg-white shadow p-6 rounded-lg">
           <DragAndDropCalendar
             localizer={localizer}
             events={calendarEvents}
-            startAccessor={(event) => moment(event.dateTimeSet).toDate() || new Date()}
-            endAccessor={(event) => moment(event.dueDateTime).toDate() || new Date()}
+            startAccessor={(event) =>
+              moment(event.dateTimeSet).toDate() || new Date()
+            }
+            endAccessor={(event) =>
+              moment(event.dueDateTime).toDate() || new Date()
+            }
             titleAccessor={(event) => event.itemLabel}
             style={{ height: 500 }}
             onEventDrop={handleEventDrop}
@@ -245,12 +217,33 @@ const DnDCalendar: React.FC = () => {
             onSelectEvent={handleSelectEvent}
             eventPropGetter={eventStyleGetter}
           />
-          {isPopupOpen && selectedTask && (
+
+          {selectedTask && !isTimerRunning && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-w-md">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+              <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-w-md relative">
+                <button
+                  onClick={handleClosePopup}
+                  className="absolute top-6 right-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                <h5 className="font-semibold mb-4 text-center text-gray-800">
                   {selectedTask.itemLabel}
-                </h2>
+                </h5>
                 <p className="text-gray-700 mb-2">
                   <strong>Description:</strong> {selectedTask.itemDescription}
                 </p>
@@ -262,44 +255,84 @@ const DnDCalendar: React.FC = () => {
                 </p>
                 <p className="text-gray-700 mb-2">
                   <strong>Start Date:</strong>{" "}
-                  {selectedTask.dateTimeSet?.toLocaleString() || "N/A"}
+                  {moment(selectedTask.dateTimeSet).format("LLL")}
                 </p>
                 <p className="text-gray-700 mb-4">
                   <strong>Due Date:</strong>{" "}
-                  {selectedTask.dueDateTime?.toLocaleString() || "N/A"}
+                  {moment(selectedTask.dueDateTime).format("LLL")}
                 </p>
+                <button
+                  onClick={() => setIsTimerRunning(true)}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Start Focus Time
+                </button>
+              </div>
+            </div>
+          )}
 
-                {!isTimerRunning ? (
-                  <div className="flex gap-4">
-                    <button
-                      onClick={handleStartFocusTimer}
-                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      Start Focus Timer
-                    </button>
-                    <button
-                      onClick={handleClosePopup}
-                      className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                    >
-                      Close
-                    </button>
+          {isTimerRunning && selectedTask && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-w-md relative">
+                {/* close button */}
+                <button
+                  onClick={handleClosePopup}
+                  className="absolute top-6 right-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                <h5 className="font-semibold mb-4 text-center text-gray-800">
+                  {selectedTask.itemLabel}
+                </h5>
+
+                <div className="flex justify-between mb-4">
+                  <div className="w-1/2 pr-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Focus Time (minutes)
+                    </label>
+                    <input
+                      type="number"
+                      value={selectedTask.focusTime ?? 0}
+                      onChange={(e) =>
+                        handleFocusTimeChange(Number(e.target.value))
+                      }
+                      className="w-full mt-1 p-2 border border-gray-300 rounded"
+                    />
                   </div>
-                ) : (
-                  <div className="flex gap-4">
-                    <button
-                      onClick={handleEndFocusTimer}
-                      className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                      End Focus Timer
-                    </button>
-                    <button
-                      onClick={handleCancelFocusTimer}
-                      className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      Cancel Timer
-                    </button>
+
+                  <div className="w-1/2 pl-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Break Time (minutes)
+                    </label>
+                    <input
+                      type="number"
+                      value={selectedTask.breakTime ?? 0}
+                      onChange={(e) =>
+                        handleBreakTimeChange(Number(e.target.value))
+                      }
+                      className="w-full mt-1 p-2 border border-gray-300 rounded"
+                    />
                   </div>
-                )}
+                </div>
+                <FocusBreakTimer
+                  initialFocusTime={(selectedTask.focusTime ?? 25) * 60} // Convert minutes to seconds
+                  initialBreakTime={(selectedTask.breakTime ?? 5) * 60} // Convert minutes to seconds
+                  task={selectedTask}
+                />
               </div>
             </div>
           )}
