@@ -4,7 +4,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AIChatBox from "./components/AIChatBox";
-import DnDCalendar from "./components/DnDCalendar";
+import DnDCalendar from "./pages/Calendar";
 import GoogleUser from "./components/GoogleUser";
 import Analytics from "./components/Analytics";
 import Login from "./components/Login";

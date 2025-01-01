@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { Bar, Pie, Line } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 import useTasks from "../../hooks/useTasksContext";
 import { TaskPriority, TaskStatus } from "../../types/task";
 import 'chart.js/auto';
@@ -9,13 +9,13 @@ interface AnalyticsData {
   totalTasks: number;
   tasksByStatus: Record<TaskStatus, number>;
   tasksByPriority: Record<TaskPriority, number>;
-  dailyTimeSpent: Record<string, number>; // Thời gian hàng ngày (giờ)
-  totalTimeSpent: number; // Tổng thời gian (giờ)
-  totalEstimatedTime: number; // Tổng thời gian ước tính (giờ)
+  dailyTaskTimeSpent: Record<string, Record<number, number>>; // Time spent on each task per day (seconds)
+  totalTimeSpent: number; // Total time spent (seconds)
+  totalEstimatedTime: number; // Total estimated time (hours)
 }
 
 const Analytics: React.FC = () => {
-  const { tasks } = useTasks();
+  const { tasks, getFocusSessionsByTaskId } = useTasks();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     totalTasks: 0,
     tasksByStatus: {
@@ -29,7 +29,7 @@ const Analytics: React.FC = () => {
       [TaskPriority.Medium]: 0,
       [TaskPriority.Low]: 0,
     },
-    dailyTimeSpent: {},
+    dailyTaskTimeSpent: {},
     totalTimeSpent: 0,
     totalEstimatedTime: 0,
   });
@@ -49,7 +49,7 @@ const Analytics: React.FC = () => {
         [TaskPriority.Low]: 0,
       };
 
-      const dailyTimeSpent: Record<string, number> = {};
+      const dailyTaskTimeSpent: Record<string, Record<number, number>> = {};
       let totalTimeSpent = 0;
       let totalEstimatedTime = 0;
 
@@ -57,38 +57,46 @@ const Analytics: React.FC = () => {
         tasksByStatus[task.itemStatus] += 1;
         tasksByPriority[task.itemPriority] += 1;
 
-        // Calculate the total duration of focusSessions in hours
-        const focusSessionsDuration = task.focusSessions
-          ? task.focusSessions.reduce((total, session) => total + session.duration, 0) / 60
-          : 0;
+        // Calculate the total duration of focusSessions in seconds
+        const focusSessions = getFocusSessionsByTaskId(task.id) || [];
+        focusSessions.forEach((session) => {
+          const dateKey = moment(session.startedAt).format("YYYY-MM-DD");
+          if (!dailyTaskTimeSpent[dateKey]) {
+            dailyTaskTimeSpent[dateKey] = {};
+          }
+          dailyTaskTimeSpent[dateKey][task.id] = (dailyTaskTimeSpent[dateKey][task.id] || 0) + session.duration;
+        });
 
-        const start = moment(task.dateTimeSet);
-        const end = moment(task.dueDateTime);
-
-        const dateKey = start.format("YYYY-MM-DD");
-        dailyTimeSpent[dateKey] = (dailyTimeSpent[dateKey] || 0) + focusSessionsDuration;
-
-        totalTimeSpent += focusSessionsDuration;
-        totalEstimatedTime += Math.max(end.diff(start, "hours", true), 0);
+        const duration = focusSessions.reduce((total, session) => total + session.duration, 0);
+        totalTimeSpent += duration;
+        totalEstimatedTime += Math.max(moment(task.dueDateTime).diff(moment(task.dateTimeSet), "hours", true), 0);
       });
 
       setAnalyticsData({
         totalTasks: tasks.length,
         tasksByStatus,
         tasksByPriority,
-        dailyTimeSpent,
+        dailyTaskTimeSpent,
         totalTimeSpent,
         totalEstimatedTime,
       });
     };
 
     analyzeTasks();
-  }, [tasks]);
+  }, [tasks, getFocusSessionsByTaskId]);
 
-  const formatTime = (hours: number) => {
-    const h = Math.floor(hours);
-    const minutes = Math.floor((hours - h) * 60);
-    return `${h}h ${minutes}m`;
+  const formatTime = (seconds: number) => {
+    if (seconds < 60) {
+      return `${seconds}s`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    if (minutes < 60) {
+      return `${minutes}m ${remainingSeconds}s`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
   };
 
   const tasksByStatusData = {
@@ -113,17 +121,13 @@ const Analytics: React.FC = () => {
     ],
   };
 
-  const dailyTimeSpentData = {
-    labels: Object.keys(analyticsData.dailyTimeSpent),
-    datasets: [
-      {
-        label: 'Daily Time Spent (hours)',
-        data: Object.values(analyticsData.dailyTimeSpent),
-        fill: false,
-        borderColor: '#4caf50',
-        tension: 0.1,
-      },
-    ],
+  const dailyTaskTimeSpentData = {
+    labels: Object.keys(analyticsData.dailyTaskTimeSpent),
+    datasets: tasks.map(task => ({
+      label: task.itemLabel || `Task ${task.id}`,
+      data: Object.keys(analyticsData.dailyTaskTimeSpent).map(date => analyticsData.dailyTaskTimeSpent[date][task.id] || 0),
+      backgroundColor: '#4caf50',
+    })),
   };
 
   return (
@@ -145,7 +149,7 @@ const Analytics: React.FC = () => {
         <div className="bg-white p-6 shadow rounded-lg">
           <h2 className="text-lg font-bold text-gray-800">Total Estimated Time</h2>
           <p className="text-3xl font-semibold text-red-600">
-            {formatTime(analyticsData.totalEstimatedTime)}
+            {formatTime(analyticsData.totalEstimatedTime * 3600)} {/* Convert hours to seconds */}
           </p>
         </div>
         <div className="bg-white p-6 shadow rounded-lg">
@@ -158,8 +162,8 @@ const Analytics: React.FC = () => {
         </div>
       </div>
       <div className="mt-8 bg-white p-6 shadow rounded-lg">
-        <h2 className="text-lg font-bold text-gray-800">Daily Time Spent</h2>
-        <Line data={dailyTimeSpentData} />
+        <h2 className="text-lg font-bold text-gray-800">Time Spent on Each Task by Day</h2>
+        <Bar data={dailyTaskTimeSpentData} />
       </div>
     </div>
   );

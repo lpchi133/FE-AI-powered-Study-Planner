@@ -1,6 +1,7 @@
 import { useAuth } from "../../hooks/useAuth";
 import { Navigate, Outlet } from "react-router-dom";
 import { TaskProvider } from "../../hooks/useTasksContext";
+import { TimerProvider } from "../../hooks/useTimerContext";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -15,9 +16,11 @@ const ProtectedRoute = () => {
 
   return (
     <div>
-      <TaskProvider>
-        <Outlet />
-      </TaskProvider>
+      <TimerProvider>
+        <TaskProvider>
+          <Outlet />
+        </TaskProvider>
+      </TimerProvider>
     </div>
   );
 };
