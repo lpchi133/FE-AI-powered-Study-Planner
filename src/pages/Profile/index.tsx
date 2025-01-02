@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
 import useAxios from "../../hooks/useAxios";
+import { toast } from "react-toastify";
 
 const Profile = () => {
   const { logout, user, fetchProfile } = useAuth();
@@ -83,6 +84,7 @@ const Profile = () => {
         // updateUser(response.data.user);
         setIsEditModalOpen(false);
         // setPasswordFormData('', '');
+        toast.success("Updated user successfully");
         fetchProfile();
       } else {
         console.error("Failed to update user data");
@@ -158,7 +160,7 @@ const Profile = () => {
 
         if (response?.success) {
           setIsPasswordModalOpen(false);
-          alert("Change Password Successful!");
+          toast.success("Changed Password successfully");
           fetchProfile();
           resetPasswordForm();
         } else {
@@ -190,7 +192,7 @@ const Profile = () => {
       // Kiểm tra `response.success` thay vì `response.data.success`
       if (response?.success) {
         setIsPasswordModalOpen(false);
-        alert("Change Password Successful!");
+        toast.success("Changed Password successfully");
         fetchProfile();
         resetPasswordForm();
       } else {

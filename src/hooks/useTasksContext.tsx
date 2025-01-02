@@ -63,9 +63,38 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     queryFn: async () => {
       const response = await get(`/tasks`);
       const data = (response || []) as Task[];
-      return data;
+  
+      const now = new Date();
+  
+      // Cập nhật trạng thái của mỗi task và đồng bộ lên database
+      const updatedTasks = await Promise.all(
+        data.map(async (task) => {
+          const dueDate = new Date(task.dueDateTime);
+          let updatedStatus = task.itemStatus;
+  
+          if (task.itemStatus !== TaskStatus.Completed) {
+            if (now > dueDate) {
+              updatedStatus = TaskStatus.Overdue;
+            } else if (task.itemStatus === TaskStatus.NotStarted && now < dueDate) {
+              updatedStatus = TaskStatus.NotStarted;
+            } else {
+              updatedStatus = TaskStatus.OnGoing;
+            }
+          }
+  
+          if (updatedStatus !== task.itemStatus) {
+            // Nếu trạng thái thay đổi, gửi yêu cầu API để cập nhật
+            await post(`/tasks/updateTaskStatus`, { id: task.id, itemStatus: updatedStatus });
+          }
+  
+          return { ...task, itemStatus: updatedStatus };
+        })
+      );
+  
+      return updatedTasks;
     },
   });
+  
 
   const searchFunction = useCallback(
     (tasks: Task[]) => {
