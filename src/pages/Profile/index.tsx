@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
 import useAxios from "../../hooks/useAxios";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Profile = () => {
   const { logout, user, fetchProfile } = useAuth();
@@ -153,17 +155,20 @@ const Profile = () => {
     if (user.checkAccountGG) {
       try {
         const response = await put("/users/changePassword", {
+          currentPassword: "",
           newPassword: passwordFormData.newPassword,
         });
 
         if (response?.success) {
           setIsPasswordModalOpen(false);
-          alert("Change Password Successful!");
+          toast.success("Change Password Successful!");
           fetchProfile();
           resetPasswordForm();
         } else {
           setPasswordError(
-            response.data.message || "Failed to change password"
+            response.data.message ||
+              response.data.message[0] ||
+              "Failed to change password"
           );
         }
       } catch (error) {
@@ -185,23 +190,27 @@ const Profile = () => {
 
     try {
       const response = await put("/users/changePassword", passwordFormData);
-    
-    
+
       // Kiểm tra `response.success` thay vì `response.data.success`
       if (response?.success) {
         setIsPasswordModalOpen(false);
-        alert("Change Password Successful!");
+        toast.success("Change Password Successful!");
         fetchProfile();
         resetPasswordForm();
       } else {
-        console.error("Failed to change password. Response:", response);
         setPasswordError("Failed to change password. Please try again.");
       }
-    } catch (error) {
-      console.error("Error changing password:", error);
-      setPasswordError("Current password is incorrect");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        setPasswordError(
+          error.response.data.message ||
+            error.response.data.message[0] ||
+            "Failed to change password"
+        );
+      } else {
+        setPasswordError("Failed to change password");
+      }
     }
-    
   };
 
   return (
