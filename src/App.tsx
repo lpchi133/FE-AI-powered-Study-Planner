@@ -14,6 +14,7 @@ import ModalControl from "./modals";
 import Todo from "./pages/NewTodo";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
+import Analytics from "./components/Analytics";
 
 function App() {
   const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/" element={<Todo />} />
                 <Route path="/calendar" element={<DnDCalendar />} />
                 <Route path="/ai_chat_box" element={<AIChatBox />} />
+                <Route path="/analytics" element={<Analytics />} />
               </Route>
 
               <Route path="/register" element={<Register />} />
