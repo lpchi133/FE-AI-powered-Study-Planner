@@ -52,8 +52,8 @@ const DnDCalendar: React.FC = () => {
     mutationFn: async (updatedTask: Task) => {
       const response = await post(`/tasks/updateTimeTask`, {
         id: updatedTask.id,
-        dateTimeSet: updatedTask.dateTimeSet?.toString().split("T")[0],
-        dueDateTime: updatedTask.dueDateTime?.toString().split("T")[0],
+        dateTimeSet: moment(updatedTask.dateTimeSet).format("YYYY-MM-DD"),
+        dueDateTime: moment(updatedTask.dueDateTime).format("YYYY-MM-DD")
       });
       return response.data;
     },
