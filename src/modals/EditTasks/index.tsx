@@ -39,9 +39,6 @@ const EditTaskModal = () => {
     },
   });
 
-
-
-
   const handleSubmit = (data: EditTaskForm) => {
     post("/tasks/updateTask",data.value)
       .then(() => {
