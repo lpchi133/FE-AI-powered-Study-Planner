@@ -6,7 +6,6 @@ import { TaskPriority, TaskStatus } from "../../types/task";
 import "chart.js/auto";
 import BarChart from "../Charts/BarChart";
 import LineChart from "../Charts/LineChart";
-import PieChart from "../Charts/PieChart";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { faSearch, faRedoAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -264,10 +263,9 @@ const Analytics: React.FC = () => {
       </div>
 
       <div className="flex bg-white shadow p-7 rounded-lg mt-8">
-        <PieChart />
         <div
-          className="flex justify-center ml-7 py-6 pl-6 pr-3 rounded-lg border-2 border-blue-300"
-          style={{ width: "61%", height: "500px" }}
+          className="flex justify-center py-6 pl-6 pr-3 rounded-lg border-2 border-blue-300"
+          style={{ height: "500px" }}
         >
           <div
             className="flex flex-col items-start"

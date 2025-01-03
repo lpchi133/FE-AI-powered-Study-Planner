@@ -53,7 +53,7 @@ const DnDCalendar: React.FC = () => {
       const response = await post(`/tasks/updateTimeTask`, {
         id: updatedTask.id,
         dateTimeSet: moment(updatedTask.dateTimeSet).format("YYYY-MM-DD"),
-        dueDateTime: moment(updatedTask.dueDateTime).format("YYYY-MM-DD")
+        dueDateTime: moment(updatedTask.dueDateTime).format("YYYY-MM-DD"),
       });
       return response.data;
     },
@@ -197,7 +197,7 @@ const DnDCalendar: React.FC = () => {
   };
 
   return (
-    <div className="p-16 mt-8 bg-blue-300 min-h-screen">
+    <div className="px-16 pb-16 pt-24 bg-blue-300 min-h-screen">
       <DndProvider backend={HTML5Backend}>
         <div className="bg-white shadow p-6 rounded-lg">
           <DragAndDropCalendar
