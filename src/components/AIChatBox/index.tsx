@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/useAuth";
 import useAxios from "../../hooks/useAxios";
 import { useState, useEffect } from "react";
-import { convertToHtml } from "./markdownToHtml";
-
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import "./index.css";
 export default function AIChatBox() {
   const { user } = useAuth();
   const { get } = useAxios();
-  const [text, setText] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false); // State to control the loading spinner when refresh is triggered
 
   // Fetch AI suggestions with React Query
@@ -19,14 +19,6 @@ export default function AIChatBox() {
     },
     enabled: false, // Do not automatically fetch when the component is mounted
   });
-
-  // Update text state when data changes
-  useEffect(() => {
-    if (data) {
-      const formattedText = convertToHtml(data); // Convert markdown to HTML
-      setText(formattedText); // Set the new data to text state
-    }
-  }, [data]);
 
   // Handle the refresh action
   const handleRefresh = async () => {
@@ -77,12 +69,7 @@ export default function AIChatBox() {
           </div>
         ) : (
           // Display fetched data
-          <div
-            className="bg-gray-100 p-4 rounded-lg shadow-inner text-gray-800 leading-relaxed"
-            dangerouslySetInnerHTML={{
-              __html: text || "No suggestions available at the moment.",
-            }}
-          />
+          <Markdown remarkPlugins={[remarkGfm]}>{data}</Markdown>
         )}
       </div>
     </div>

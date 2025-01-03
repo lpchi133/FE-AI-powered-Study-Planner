@@ -57,37 +57,41 @@ const TaskList = ({taskIds,isArchive,emptyCaption}:Props) => {
       // Kiểm tra xem a và b có thuộc tính key hay không
       const aTask = taskMap[a];
       const bTask = taskMap[b];
-
-     if(!aTask || !bTask) return 0;
-     if(order ==="") return 0;
-
+  
+      if (!aTask || !bTask) return 0;
+      if (order === "") return 0;
+  
       const valueA = aTask[key];
       const valueB = bTask[key];
-
+  
       // Nếu key là priority, so sánh ưu tiên
       if (key === "itemPriority") {
         const priorityOrder = { [TaskPriority.High]: 3, [TaskPriority.Medium]: 2, [TaskPriority.Low]: 1 };
-        const priorityA = priorityOrder[valueA as TaskPriority ] || 0;
+        const priorityA = priorityOrder[valueA as TaskPriority] || 0;
         const priorityB = priorityOrder[valueB as TaskPriority] || 0;
-        console.log (" A",priorityA, " b",priorityB, " ->",valueA, aTask)
-
+        console.log(" A", priorityA, " b", priorityB, " ->", valueA, aTask);
+  
         // So sánh theo thứ tự ưu tiên, HIGH > MEDIUM > LOW
         return order === "desc" ? priorityB - priorityA : priorityA - priorityB;
       }
-      if(key === "dateTimeSet" || key==="dueDateTime"){
-        return (order==="asc"?1:order==="desc"?-1:0) * (moment(valueA).isBefore(moment(valueB)) ? -1 :1);
+  
+      if (key === "dateTimeSet" || key === "dueDateTime") {
+        const dateA = typeof valueA === "string" ? moment(valueA) : null;
+        const dateB = typeof valueB === "string" ? moment(valueB) : null;
+        if (!dateA || !dateB) return 0;
+        return (order === "asc" ? 1 : order === "desc" ? -1 : 0) * (dateA.isBefore(dateB) ? -1 : 1);
       }
-
+  
       // Nếu giá trị là string, sử dụng localeCompare
       if (typeof valueA === "string" && typeof valueB === "string") {
         return order === "desc" ? valueB.localeCompare(valueA) : valueA.localeCompare(valueB);
       }
-
+  
       // Nếu giá trị là number, so sánh trực tiếp
       if (typeof valueA === "number" && typeof valueB === "number") {
         return order === "desc" ? valueB - valueA : valueA - valueB;
       }
-
+  
       return 0; // Nếu các giá trị không phải string hoặc number, trả về 0
     };
   };
@@ -170,15 +174,15 @@ const TaskList = ({taskIds,isArchive,emptyCaption}:Props) => {
               <th scope="col" className="des-column">
                 Description
               </th>
-              <th onClick={() => sortTasks("dueDateTime", true)} scope="col">
+              <th onClick={() => sortTasks("dueDateTime", true)} scope="col" className="end-date-column">
                 <div className="sort-icon">
                   End Date
                   {getSortIcon("dueDateTime")}
                 </div>
               </th>
 
-              <th scope="col"></th>
-              <th scope="col"></th>
+              <th scope="col" className="end1-date-column"></th>
+              <th scope="col" ></th>
             </tr>
           </thead>
           <tbody>

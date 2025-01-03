@@ -30,7 +30,7 @@ const Register = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Registration successful!");
+      toast.success("Registration successful! Please check your email to activate your account.");
       navigate("/login");
     },
     onError: (error: { response: { data: { message: string } } }) => {
@@ -117,7 +117,6 @@ const Register = () => {
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <title>hehe</title>
                   <circle
                     className="opacity-25"
                     cx="12"

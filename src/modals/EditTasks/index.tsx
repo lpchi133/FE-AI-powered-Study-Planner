@@ -39,9 +39,6 @@ const EditTaskModal = () => {
     },
   });
 
-
-
-
   const handleSubmit = (data: EditTaskForm) => {
     post("/tasks/updateTask",data.value)
       .then(() => {
@@ -64,14 +61,11 @@ const EditTaskModal = () => {
     const startDate = moment(methods.watch("value.dateTimeSet"));
     const dueDate = moment(methods.watch("value.dueDateTime"));
     const now = moment();
-    const daysDiff = dueDate.diff(startDate, "days");
 
     if (now.isAfter(dueDate)) {
       methods.setValue("value.itemStatus", TaskStatus.Overdue);
     } else if (now.isBefore(startDate)) {
       methods.setValue("value.itemStatus", TaskStatus.NotStarted);
-    } else if (daysDiff <= 2) {
-      methods.setValue("value.itemStatus", TaskStatus.Pending);
     } else {
       methods.setValue("value.itemStatus", TaskStatus.OnGoing);
     }

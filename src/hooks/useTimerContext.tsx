@@ -1,4 +1,5 @@
 import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TimerContextType {
   isFinish: boolean;
@@ -12,9 +13,13 @@ const TimerContext = React.createContext<TimerContextType | undefined>(
 
 export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
   const [isFinish, setIsFinish] = React.useState(true);
+  const queryClient = useQueryClient();
 
   const handleFinish = () => {
     setIsFinish(true);
+    queryClient.refetchQueries({
+      queryKey: ["tasks"],
+    });
   };
 
   const handleReset = () => {

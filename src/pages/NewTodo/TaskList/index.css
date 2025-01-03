@@ -58,6 +58,15 @@ svg {
   display: inline-block;
 }
 
+.end-date-column {
+  border-radius: 0 !important; /* Xóa bo tròn */
+}
+
+.end1-date-column {
+  border-radius: 0 10px 10px 0 ; /* Bo tròn bên phải */
+  overflow: hidden;
+}
+
 .center-image {
   display: block;
   margin: 0 auto;

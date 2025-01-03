@@ -10,6 +10,7 @@ export type Task = {
 	userId: number;
 	focusTime: number | null;
 	breakTime: number | null;
+	focusSessions: FocusSession[];
 };
 
 export type FocusSession = {
@@ -27,7 +28,6 @@ export enum TaskPriority {
 }
 export enum TaskStatus {
 	Completed = "Completed",
-	Pending = "Pending",
 	Overdue = "Overdue",
 	NotStarted = "Not Started",
 	OnGoing = "OnGoing",

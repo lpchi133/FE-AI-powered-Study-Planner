@@ -67,6 +67,7 @@ export default function Header() {
           </nav>
         )}
 
+
         {/* User profile / Auth links */}
         <div className="space-x-4 relative">
           {user ? (
