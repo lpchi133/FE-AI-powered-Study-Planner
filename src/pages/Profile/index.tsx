@@ -85,6 +85,7 @@ const Profile = () => {
         // updateUser(response.data.user);
         setIsEditModalOpen(false);
         // setPasswordFormData('', '');
+        toast.success("Updated user successfully");
         fetchProfile();
       } else {
         console.error("Failed to update user data");
@@ -161,7 +162,7 @@ const Profile = () => {
 
         if (response?.success) {
           setIsPasswordModalOpen(false);
-          toast.success("Change Password Successful!");
+          toast.success("Changed Password Successfully");
           fetchProfile();
           resetPasswordForm();
         } else {
@@ -194,7 +195,7 @@ const Profile = () => {
       // Kiểm tra `response.success` thay vì `response.data.success`
       if (response?.success) {
         setIsPasswordModalOpen(false);
-        toast.success("Change Password Successful!");
+        toast.success("Changed Password Successfully");
         fetchProfile();
         resetPasswordForm();
       } else {

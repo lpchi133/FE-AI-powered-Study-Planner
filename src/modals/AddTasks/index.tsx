@@ -50,14 +50,11 @@ const AddTaskModal = () => {
     const startDate = moment(methods.watch("dateTimeSet"));
     const dueDate = moment(methods.watch("dueDateTime"));
     const now = moment();
-    const daysDiff = dueDate.diff(startDate, "days");
 
     if (now.isAfter(dueDate)) {
       methods.setValue("itemStatus", TaskStatus.Overdue);
     } else if (now.isBefore(startDate)) {
       methods.setValue("itemStatus", TaskStatus.NotStarted);
-    } else if (daysDiff <= 2) {
-      methods.setValue("itemStatus", TaskStatus.Pending);
     } else {
       methods.setValue("itemStatus", TaskStatus.OnGoing);
     }

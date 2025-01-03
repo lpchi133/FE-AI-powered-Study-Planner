@@ -6,9 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 import AIChatBox from "./components/AIChatBox";
 import DnDCalendar from "./pages/Calendar";
 import GoogleUser from "./components/GoogleUser";
+import Analytics from "./components/Analytics";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./components/Register";
+import ActivateAccount from "./components/ActivateAccount";
 import { AuthProvider } from "./context/AuthContext";
 import ModalControl from "./modals";
 import Todo from "./pages/NewTodo";
@@ -36,7 +38,11 @@ function App() {
                 <Route path="/" element={<Todo />} />
                 <Route path="/calendar" element={<DnDCalendar />} />
                 <Route path="/ai_chat_box" element={<AIChatBox />} />
+                <Route path="/analytics" element={<Analytics />} />
               </Route>
+
+              <Route path="/register" element={<Register />} />
+              <Route path="/activate" element={<ActivateAccount />} />
             </Routes>
             <ModalControl />
           </Suspense>

@@ -54,8 +54,19 @@ export default function Header() {
             >
               AI Chat Box
             </Link>
+            <Link
+              to="/analytics"
+              className={`px-3 py-1 rounded-md ${
+                location.pathname === "/analytics"
+                  ? "bg-blue-500 text-white font-bold underline"
+                  : "text-white hover:bg-blue-700 no-underline"
+              }`}
+            >
+              Analytics
+            </Link>
           </nav>
         )}
+
 
         {/* User profile / Auth links */}
         <div className="space-x-4 relative">
