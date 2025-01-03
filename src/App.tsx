@@ -16,6 +16,7 @@ import ModalControl from "./modals";
 import Todo from "./pages/NewTodo";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const queryClient = new QueryClient();
@@ -29,6 +30,8 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/google/user/:token" element={<GoogleUser />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<Profile />} />

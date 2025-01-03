@@ -4,6 +4,7 @@ import useAxios from "./useAxios";
 import { Task, TaskStatus, FocusSession } from "../types/task";
 import moment, { Moment } from "moment";
 
+
 type TasksContextType = {
   tasks: Task[];
   getTaskById: (id: number) => Task | undefined;
@@ -63,9 +64,7 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     queryFn: async () => {
       const response = await get(`/tasks`);
       const data = (response || []) as Task[];
-  
-      const now = new Date();
-  
+      console.log("Fetched tasks:", data); // Thêm log để kiểm tra dữ liệu
       // Cập nhật trạng thái của mỗi task và đồng bộ lên database
       const updatedTasks = await Promise.all(
         data.map(async (task) => {
@@ -73,9 +72,9 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
           let updatedStatus = task.itemStatus;
   
           if (task.itemStatus !== TaskStatus.Completed) {
-            if (now > dueDate) {
+            if (new Date() > dueDate) {
               updatedStatus = TaskStatus.Overdue;
-            } else if (task.itemStatus === TaskStatus.NotStarted && now < dueDate) {
+            } else if (task.itemStatus === TaskStatus.NotStarted && new Date() < dueDate) {
               updatedStatus = TaskStatus.NotStarted;
             } else {
               updatedStatus = TaskStatus.OnGoing;
@@ -93,6 +92,7 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
   
       return updatedTasks;
     },
+    staleTime: 0, // Luôn làm mới dữ liệu
   });
   
 
@@ -182,7 +182,8 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
   const getFocusSessionsByTaskId = useCallback(
     (taskId: number) => {
       const task = getTaskById(taskId);
-      return task ? task.focusSessions : [];
+      const focusSessions = task ? task.focusSessions : [];
+      return focusSessions;
     },
     [getTaskById]
   );
