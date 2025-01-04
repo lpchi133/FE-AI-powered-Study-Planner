@@ -281,12 +281,19 @@ const Analytics: React.FC = () => {
             <h2 className="text-lg font-bold text-gray-800">Tasks by Status</h2>
             <Pie data={tasksByStatusData} />
           </div>
-          <div className="bg-white p-6 shadow rounded-lg">
+          <div className="bg-white shadow p-7 rounded-lg mt-8">
             <h2 className="text-lg font-bold text-gray-800">
               Tasks by Priority
             </h2>
+            <div className="flex justify-center">
+              <div
+                style={{ height: "500px", width: "100%" }}
+                className="flex justify-center"
+              >
+                <Bar data={tasksByPriorityData} />
+              </div>
+            </div>
 
-            <Bar data={tasksByPriorityData} />
           </div>
         </div>
       </div>
