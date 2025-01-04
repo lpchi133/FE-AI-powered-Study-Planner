@@ -10,6 +10,7 @@ interface FocusBreakTimerProps {
   initialFocusTime: number; // Focus time in seconds
   initialBreakTime: number; // Break time in seconds
   task: Task;
+  onClose: () => void;
 }
 
 const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
