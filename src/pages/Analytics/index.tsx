@@ -287,7 +287,7 @@ const Analytics: React.FC = () => {
             </h2>
             <div className="flex justify-center">
               <div
-                style={{ height: "500px", width: "100%" }}
+                style={{ height: "200px", width: "100%" }}
                 className="flex justify-center"
               >
                 <Bar data={tasksByPriorityData} />
