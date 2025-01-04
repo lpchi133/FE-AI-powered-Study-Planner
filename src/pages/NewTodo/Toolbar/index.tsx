@@ -76,7 +76,7 @@ const Toolbar = () => {
 
               {/* From Date */}
               <Form.Group
-                style={{ width: "260px" }}
+                style={{ width: "280px" }}
                 controlId="validationFromDate"
               >
                 <InputGroup>

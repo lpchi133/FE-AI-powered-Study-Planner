@@ -208,7 +208,7 @@ const Login = () => {
                 className="bg-white border py-2 w-full rounded-xl mt-6 flex justify-center items-center text-sm hover:scale-105 duration-300 hover:bg-[#60a8bc4f] font-medium"
               >
                 <svg
-                  className="mr-3"
+                  className="mr-3 mt-0"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 48 48"
                   width="25px"

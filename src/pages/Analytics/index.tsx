@@ -14,14 +14,13 @@ import AIFeedBack from "./AIFeedBack";
 const Analytics: React.FC = () => {
   const { tasks, getTaskMap } = useTasks();
 
-  const taskMap = getTaskMap()
+  const taskMap = getTaskMap();
   const analyticsStatusData = useMemo(() => {
-    return _.groupBy(tasks, 'itemStatus')
-  }, [tasks])
+    return _.groupBy(tasks, "itemStatus");
+  }, [tasks]);
   const analyticsPriorityData = useMemo(() => {
-    return _.groupBy(tasks, 'itemPriority')
-  }
-    , [tasks])
+    return _.groupBy(tasks, "itemPriority");
+  }, [tasks]);
 
   const taskSpentTime = useMemo(() => {
     const dailyTaskTimeSpent: Record<string, Record<string, number>> = {};
@@ -45,11 +44,7 @@ const Analytics: React.FC = () => {
       );
       totalTimeSpent += duration;
       totalEstimatedTime += Math.max(
-        moment(task.dueDateTime).diff(
-          moment(task.dateTimeSet),
-          "hours",
-          true
-        ),
+        moment(task.dueDateTime).diff(moment(task.dateTimeSet), "hours", true),
         0
       );
     });
@@ -57,45 +52,58 @@ const Analytics: React.FC = () => {
       dailyTaskTimeSpent,
       totalTimeSpent,
       totalEstimatedTime,
-    }
-  }, [tasks])
-
+    };
+  }, [tasks]);
 
   const focusTimePerTask = useMemo(() => {
-    return tasks.reduce((acc, task) => {
-      const focusSessions = task?.focusSessions || [];
-      const focusTime = focusSessions.reduce(
-        (total, { startedAt, endedAt }) => total + (!startedAt || !endedAt ? 0 : moment(endedAt).diff(moment(startedAt), "seconds")),
-        0
-      );
-      return {
-        ...acc,
-        [task.id]: focusTime,
-      };
-    }, {} as Record<string, number>);
-  }, [tasks])
+    return tasks.reduce(
+      (acc, task) => {
+        const focusSessions = task?.focusSessions || [];
+        const focusTime = focusSessions.reduce(
+          (total, { startedAt, endedAt }) =>
+            total +
+            (!startedAt || !endedAt
+              ? 0
+              : moment(endedAt).diff(moment(startedAt), "seconds")),
+          0
+        );
+        return {
+          ...acc,
+          [task.id]: focusTime,
+        };
+      },
+      {} as Record<string, number>
+    );
+  }, [tasks]);
 
   const overtimeTasksByMonth = useMemo(() => {
-    return tasks.reduce((acc, task) => {
-      const dueDate = moment(task.dueDateTime);
-      const month = dueDate.format("YYYY-MM");
-      if (!acc[month]) {
-        acc[month] = [];
-      }
-      if (task.itemStatus === TaskStatus.Overdue) {
-        acc[month].push(task);
-      }
-      return acc;
-    }, {} as Record<string, Task[]>);
+    return tasks.reduce(
+      (acc, task) => {
+        const dueDate = moment(task.dueDateTime);
+        const month = dueDate.format("YYYY-MM");
+        if (!acc[month]) {
+          acc[month] = [];
+        }
+        if (task.itemStatus === TaskStatus.Overdue) {
+          acc[month].push(task);
+        }
+        return acc;
+      },
+      {} as Record<string, Task[]>
+    );
   }, [tasks]);
   const tasksByStatusData = useMemo(() => {
     return {
       labels: Object.keys(analyticsStatusData),
-      datasets: [{
-        label: "Tasks quantity",
-        data: Object.keys(analyticsStatusData).map((key) => analyticsStatusData[key].length),
-      }]
-    }
+      datasets: [
+        {
+          label: "Tasks quantity",
+          data: Object.keys(analyticsStatusData).map(
+            (key) => analyticsStatusData[key].length
+          ),
+        },
+      ],
+    };
   }, [analyticsStatusData]);
 
   const tasksByPriorityData = useMemo(() => {
@@ -103,60 +111,75 @@ const Analytics: React.FC = () => {
       return {
         label: key,
         data: [analyticsPriorityData[key].length],
-      }
-    }
-    )
+      };
+    });
     return {
       labels: ["Priority"],
-      datasets: datsets
-    }
+      datasets: datsets,
+    };
   }, [analyticsPriorityData]);
 
   const dailyTaskTimeSpentData = useMemo(() => {
-    const taskTimePerDay = Object.keys(taskSpentTime.dailyTaskTimeSpent).reduce((acc, key) => {
-      Object.keys(taskSpentTime.dailyTaskTimeSpent[key]).forEach((id: string) => {
-        if (!acc[id]) {
-          acc[id] = {};
-        }
-        acc[id][key] = taskSpentTime.dailyTaskTimeSpent[key][id];
-      });
-      return acc;
-    }, {} as Record<string, Record<string, number>>);
+    const taskTimePerDay = Object.keys(taskSpentTime.dailyTaskTimeSpent).reduce(
+      (acc, key) => {
+        Object.keys(taskSpentTime.dailyTaskTimeSpent[key]).forEach(
+          (id: string) => {
+            if (!acc[id]) {
+              acc[id] = {};
+            }
+            acc[id][key] = taskSpentTime.dailyTaskTimeSpent[key][id];
+          }
+        );
+        return acc;
+      },
+      {} as Record<string, Record<string, number>>
+    );
     const datasets = Object.keys(taskTimePerDay).map((key) => {
-
       return {
         label: `${key} - ${taskMap[+key]?.itemLabel}`,
-        data: Object.keys(taskSpentTime.dailyTaskTimeSpent).map((date: string) => taskTimePerDay[key] ? taskTimePerDay[key][date] ?? 0 : 0),
+        data: Object.keys(taskSpentTime.dailyTaskTimeSpent).map(
+          (date: string) =>
+            taskTimePerDay[key] ? (taskTimePerDay[key][date] ?? 0) : 0
+        ),
         stack: key,
-      }
-    })
+      };
+    });
     return {
       labels: Object.keys(taskSpentTime.dailyTaskTimeSpent),
-      datasets: datasets
-    }
+      datasets: datasets,
+    };
   }, [taskSpentTime.dailyTaskTimeSpent, taskMap]);
-
 
   const focusTimePerTaskData = useMemo(() => {
     return {
-      labels: Object.keys(focusTimePerTask).map((key) => `${key} - ${taskMap[+key]?.itemLabel}`),
-      datasets: [{
-        label: "Focus Time",
-        data: Object.keys(focusTimePerTask).map((key) => focusTimePerTask[key]),
-      }]
-    }
+      labels: Object.keys(focusTimePerTask).map(
+        (key) => `${key} - ${taskMap[+key]?.itemLabel}`
+      ),
+      datasets: [
+        {
+          label: "Focus Time",
+          data: Object.keys(focusTimePerTask).map(
+            (key) => focusTimePerTask[key]
+          ),
+        },
+      ],
+    };
   }, [focusTimePerTask, taskMap]);
 
   const overtimeTasksByMonthData = useMemo(() => {
-    const sortedKeys = Object.keys(overtimeTasksByMonth).sort((a, b) => moment(a).diff(moment(b)));
+    const sortedKeys = Object.keys(overtimeTasksByMonth).sort((a, b) =>
+      moment(a).diff(moment(b))
+    );
 
     return {
       labels: sortedKeys,
-      datasets: [{
-        label: "Overtime Tasks",
-        data: sortedKeys.map((key) => overtimeTasksByMonth[key].length),
-      }]
-    }
+      datasets: [
+        {
+          label: "Overtime Tasks",
+          data: sortedKeys.map((key) => overtimeTasksByMonth[key].length),
+        },
+      ],
+    };
   }, [overtimeTasksByMonth]);
 
   return (
@@ -173,8 +196,8 @@ const Analytics: React.FC = () => {
           </Form.Group>
         </div>
 
-        <div className="flex space-x-3 mr-48 w-[35%]">
-          <Form.Group controlId="validationFromDate" className="w-[260px]" >
+        <div className="flex space-x-3 mr-48 w-[36%]">
+          <Form.Group controlId="validationFromDate" className="w-[280px]">
             <InputGroup>
               <InputGroup.Text id="inputGroupPrepend1">From</InputGroup.Text>
               <Form.Control
@@ -203,7 +226,7 @@ const Analytics: React.FC = () => {
           </Form.Group>
         </div>
 
-        <div className="flex justify-end space-x-3 w-[30%]" >
+        <div className="flex justify-end space-x-3 w-[30%]">
           <Form.Group controlId="validationSubmit" className="w-[30%]">
             <Button
               className="search-btn btn-block"
@@ -220,7 +243,7 @@ const Analytics: React.FC = () => {
               variant="danger"
               type="reset"
 
-            // onClick={onRefresh}
+              // onClick={onRefresh}
             >
               <FontAwesomeIcon icon={faRedoAlt} />
             </Button>
@@ -255,9 +278,7 @@ const Analytics: React.FC = () => {
             </p>
           </div>
           <div className="bg-white p-6 shadow rounded-lg">
-            <h2 className="text-lg font-bold text-gray-800">
-              Tasks by Status
-            </h2>
+            <h2 className="text-lg font-bold text-gray-800">Tasks by Status</h2>
             <Pie data={tasksByStatusData} />
           </div>
           <div className="bg-white p-6 shadow rounded-lg">
@@ -311,8 +332,6 @@ const Analytics: React.FC = () => {
           </div>
         </div>
       </div>
-
-
     </div>
   );
 };
