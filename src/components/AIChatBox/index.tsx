@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import "./index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
+
 export default function AIChatBox() {
   const { user } = useAuth();
   const { get } = useAxios();
@@ -34,7 +35,13 @@ export default function AIChatBox() {
   // Handle page reload (triggered by browser reload or manual reload)
   useEffect(() => {
     if (user?.id) {
-      refetch(); // Fetch the data when the component mounts (if the user exists)
+      const hasFetched = localStorage.getItem("hasFetchedAISuggestion");
+
+      if (!hasFetched) {
+        // Chỉ fetch nếu người dùng chưa từng truy cập
+        refetch();
+        localStorage.setItem("hasFetchedAISuggestion", "true"); // Đánh dấu đã fetch
+      }
     }
   }, [user?.id, refetch]);
 
