@@ -74,7 +74,7 @@ const Toolbar = () => {
                 </InputGroup>
               </Form.Group>
 
-              <div className="dateBar">
+              <div className="flex dateBar">
                 {/* From Date */}
                 <Form.Group className="fromDate" controlId="validationFromDate">
                   <InputGroup>
@@ -110,7 +110,7 @@ const Toolbar = () => {
                 </Form.Group>
               </div>
 
-              <div className="buttonBar">
+              <div className=" flex buttonBar">
                 {/* Nút Submit */}
                 <Form.Group
                   className="btn-bar mr-4"

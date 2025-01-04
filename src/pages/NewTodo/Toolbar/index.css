@@ -99,7 +99,18 @@ input[type="datetime-local"] {
   width: 90px;
 }
 
-@media screen and (max-width: 1250px) {
+.dateBar {
+  width: fit-content;
+  .fromDate {
+    margin-right: 16px;
+  }
+}
+
+.buttonBar {
+  width: fit-content;
+}
+
+@media screen and (max-width: 1360px) {
   .responsive-navbar-nav {
     padding-top: 40px;
   }
@@ -120,12 +131,12 @@ input[type="datetime-local"] {
   }
 
   .dateBar {
-    display: flex;
     justify-content: space-between;
     width: 100%;
     margin-bottom: 16px;
     .fromDate {
       width: 48%;
+      margin-right: 0;
     }
     .toDate {
       width: 48%;
@@ -133,7 +144,6 @@ input[type="datetime-local"] {
   }
 
   .buttonBar {
-    display: flex;
     justify-content: center;
     width: 100%;
     margin-bottom: 16px;
@@ -143,8 +153,14 @@ input[type="datetime-local"] {
   }
 }
 
-@media screen and (max-width: 700px) {
-  .responsive-navbar-nav {
-    padding-top: 60px;
+@media screen and (max-width: 755px) {
+  .nav-2 .row {
+    padding-top: 25px;
+  }
+}
+
+@media screen and (max-width: 707px) {
+  .nav-2 .row {
+    padding-top: 50px;
   }
 }

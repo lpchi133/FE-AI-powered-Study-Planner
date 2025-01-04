@@ -56,7 +56,6 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
       handleFinish();
       setLabel("Start");
       toast.success(rs.message);
-      
     },
     onError: (error) => {
       console.log(error);

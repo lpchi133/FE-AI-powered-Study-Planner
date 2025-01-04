@@ -67,7 +67,7 @@ export default function Header() {
         )}
 
         {/* User profile / Auth links */}
-        <div className="space-x-4 relative">
+        <div className="space-x-4 relative ml-2">
           {user ? (
             <div className="flex items-center">
               <span className="hidden lg:inline text-white mr-2 ml-4 overflow-hidden whitespace-nowrap text-ellipsis">
@@ -77,7 +77,7 @@ export default function Header() {
                 <img
                   src={user.profilePicture || "/images/avt.jpg"}
                   alt="Profile"
-                  className="hidden md:inline w-8 h-8 rounded-full cursor-pointer"
+                  className="hidden custom1:inline w-8 h-8 rounded-full cursor-pointer"
                 />
               </Link>
 
