@@ -1,4 +1,4 @@
-import { Button, Col, Form, InputGroup, Nav, Navbar } from "react-bootstrap";
+import { Button, Form, InputGroup, Nav, Navbar } from "react-bootstrap";
 import events, { EventKeys } from "../../../utils/eventBus";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRedoAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -27,7 +27,6 @@ const Toolbar = () => {
     resetSearch(); // Đặt lại trạng thái tìm kiếm
     methods.reset();
   };
-  
 
   const handleSubmit = (data: SearchState) => {
     console.log(data);
@@ -41,7 +40,10 @@ const Toolbar = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="nav-2 mx-auto">
             <Form className="row" onSubmit={methods.handleSubmit(handleSubmit)}>
-              <Form.Group as={Col} lg="2" controlId="validationAddTask">
+              <Form.Group
+                style={{ width: "170px" }}
+                controlId="validationAddTask"
+              >
                 <Button
                   className="addtask-btn btn-block"
                   variant="primary"
@@ -56,7 +58,10 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* Ô Search Tasks */}
-              <Form.Group as={Col} lg="4" controlId="validationSearchTasks">
+              <Form.Group
+                style={{ width: "360px" }}
+                controlId="validationSearchTasks"
+              >
                 <InputGroup>
                   <InputGroup.Text id="inputGroupSearchTasks">
                     Search
@@ -70,7 +75,10 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* From Date */}
-              <Form.Group as={Col} lg="2" controlId="validationFromDate">
+              <Form.Group
+                style={{ width: "260px" }}
+                controlId="validationFromDate"
+              >
                 <InputGroup>
                   <InputGroup.Text id="inputGroupPrepend1">
                     From
@@ -87,7 +95,10 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* To Date */}
-              <Form.Group as={Col} lg="2" controlId="validationToDate">
+              <Form.Group
+                style={{ width: "260px" }}
+                controlId="validationToDate"
+              >
                 <InputGroup>
                   <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
                   <Form.Control
@@ -102,7 +113,10 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* Nút Submit */}
-              <Form.Group as={Col} lg="1" controlId="validationSubmit">
+              <Form.Group
+                style={{ width: "90px" }}
+                controlId="validationSubmit"
+              >
                 <Button
                   className="search-btn btn-block"
                   variant="primary"
@@ -113,7 +127,7 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* Nút Reset */}
-              <Form.Group as={Col} lg="1" controlId="validationReset">
+              <Form.Group style={{ width: "90px" }} controlId="validationReset">
                 <Button
                   className="search-btn btn-block"
                   variant="danger"

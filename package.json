@@ -38,7 +38,9 @@
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.28.0",
     "react-toastify": "^10.0.6",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "@types/lodash": "^4.17.14",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

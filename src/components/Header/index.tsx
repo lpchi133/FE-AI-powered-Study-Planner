@@ -22,61 +22,49 @@ export default function Header() {
         </div>
 
         {user && (
-        <nav className="flex space-x-4">
-          <Link
-            to="/"
-            className={`px-3 py-1 rounded-md ${
-              location.pathname === "/" 
-                ? "bg-blue-500 text-white font-bold underline" 
-                : "text-white hover:bg-blue-700 no-underline"
-            }`}
-          >
-            Tasks
-          </Link>
-          <Link
-            to="/calendar"
-            className={`px-3 py-1 rounded-md ${
-              location.pathname === "/calendar" 
-                ? "bg-blue-500 text-white font-bold underline" 
-                : "text-white hover:bg-blue-700 no-underline"
-            }`}
-          >
-            Calendar
-          </Link>
-          <Link
-            to="/ai_chat_box"
-            className={`px-3 py-1 rounded-md ${
-              location.pathname === "/ai_chat_box" 
-                ? "bg-blue-500 text-white font-bold underline" 
-                : "text-white hover:bg-blue-700 no-underline"
-            }`}
-          >
-            AI Chat Box
-          </Link>
-          <Link
-            to="/analytics"
-            className={`px-3 py-1 rounded-md ${
-              location.pathname === "/analytics" 
-                ? "bg-blue-500 text-white font-bold underline" 
-                : "text-white hover:bg-blue-700 no-underline"
-            }`}
-          >
-            Analytics
-          </Link>
-          <Link
-            to="/dashboard"
-            className={`px-3 py-1 rounded-md ${
-              location.pathname === "/dashboard" 
-                ? "bg-blue-500 text-white font-bold underline" 
-                : "text-white hover:bg-blue-700 no-underline"
-            }`}
-          >
-            Dashboard
-          </Link>
-        </nav>
-      )}
-
-
+          <nav className="flex space-x-4">
+            <Link
+              to="/"
+              className={`px-3 py-1 rounded-md ${
+                location.pathname === "/"
+                  ? "bg-blue-500 text-white font-bold underline"
+                  : "text-white hover:bg-blue-700 no-underline"
+              }`}
+            >
+              Tasks
+            </Link>
+            <Link
+              to="/calendar"
+              className={`px-3 py-1 rounded-md ${
+                location.pathname === "/calendar"
+                  ? "bg-blue-500 text-white font-bold underline"
+                  : "text-white hover:bg-blue-700 no-underline"
+              }`}
+            >
+              Calendar
+            </Link>
+            <Link
+              to="/ai_chat_box"
+              className={`px-3 py-1 rounded-md ${
+                location.pathname === "/ai_chat_box"
+                  ? "bg-blue-500 text-white font-bold underline"
+                  : "text-white hover:bg-blue-700 no-underline"
+              }`}
+            >
+              AI Chat Box
+            </Link>
+            <Link
+              to="/analytics"
+              className={`px-3 py-1 rounded-md ${
+                location.pathname === "/analytics"
+                  ? "bg-blue-500 text-white font-bold underline"
+                  : "text-white hover:bg-blue-700 no-underline"
+              }`}
+            >
+              Analytics
+            </Link>
+          </nav>
+        )}
 
         {/* User profile / Auth links */}
         <div className="space-x-4 relative">
