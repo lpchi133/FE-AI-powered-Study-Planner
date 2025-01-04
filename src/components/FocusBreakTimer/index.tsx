@@ -4,6 +4,7 @@ import { Task, TaskStatus } from "../../types/task";
 import useAxios from "../../hooks/useAxios";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { io } from "socket.io-client";
 
 interface FocusBreakTimerProps {
   initialFocusTime: number; // Focus time in seconds
@@ -15,6 +16,7 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
   initialFocusTime,
   initialBreakTime,
   task,
+  onClose,
 }) => {
   const [mode, setMode] = useState<"focus" | "break">("focus");
   const { handleFinish, handleReset } = useTimer();
@@ -23,6 +25,35 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
   const [label, setLabel] = useState("Start");
   const [sessionId, setSessionId] = useState<number | null>(null);
   const { post, patch } = useAxios();
+
+  // WebSocket setup
+  useEffect(() => {
+    const socket = io(import.meta.env.VITE_ENDPOINT_URL);
+
+    socket.on("connect", () => {
+      console.log("Connected to WebSocket server");
+    });
+
+    socket.on(
+      "taskDeadlineReached",
+      (data: { taskId: number; message: string }) => {
+        if (data.taskId === task.id) {
+          setIsRunning(false);
+          setMode("focus");
+          setTimeLeft(initialFocusTime);
+          handleFinish();
+          setLabel("Start");
+          task.itemStatus = TaskStatus.Overdue;
+          toast.info(data.message);
+          onClose();
+        }
+      }
+    );
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [task.id, handleFinish, initialFocusTime]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
@@ -56,7 +87,6 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
       handleFinish();
       setLabel("Start");
       toast.success(rs.message);
-      
     },
     onError: (error) => {
       console.log(error);
@@ -110,6 +140,7 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
     onSuccess: () => {
       task.itemStatus = TaskStatus.Completed;
       toast.success("Task marked as completed");
+      onClose();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -188,10 +219,7 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
             )}
 
             {task.itemStatus === "Completed" && (
-              <button
-                onClick={handleMarkCompleted}
-                className="px-4 py-2 bg-green-400 text-white rounded-lg"
-              >
+              <button className="px-4 py-2 bg-green-400 text-white rounded-lg">
                 Completed
               </button>
             )}
