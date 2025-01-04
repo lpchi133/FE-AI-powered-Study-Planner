@@ -10,6 +10,7 @@ import useTasks from "../../hooks/useTasksContext";
 import { Task, TaskStatus } from "../../types/task";
 import { formatTime } from "../../utils/helpers";
 import AIFeedBack from "./AIFeedBack";
+import "./index.css";
 
 const Analytics: React.FC = () => {
   const { tasks, getTaskMap } = useTasks();
@@ -183,9 +184,9 @@ const Analytics: React.FC = () => {
   }, [overtimeTasksByMonth]);
 
   return (
-    <div className="bg-blue-300 pt-24 px-16 pb-16">
-      <div className="flex w-full">
-        <div className="mr-24 w-[15%]">
+    <div className="bg-blue-300 pt-24 px-16 pb-16 page">
+      <div className="flex w-full tutorialBar">
+        <div className="mr-24 w-[15%] selectionBar">
           <Form.Group controlId="validationSelect">
             <Form.Select aria-label="Select time range" className="form-select">
               <option value="1">Today</option>
@@ -196,8 +197,11 @@ const Analytics: React.FC = () => {
           </Form.Group>
         </div>
 
-        <div className="flex space-x-3 mr-48 w-[36%]">
-          <Form.Group controlId="validationFromDate" className="w-[280px]">
+        <div className="flex space-x-3 mr-48 w-[36%] dateBar">
+          <Form.Group
+            controlId="validationFromDate"
+            className="w-[280px] fromDate"
+          >
             <InputGroup>
               <InputGroup.Text id="inputGroupPrepend1">From</InputGroup.Text>
               <Form.Control
@@ -211,7 +215,7 @@ const Analytics: React.FC = () => {
             </InputGroup>
           </Form.Group>
 
-          <Form.Group controlId="validationToDate" className="w-[260px]">
+          <Form.Group controlId="validationToDate" className="w-[260px] toDate">
             <InputGroup>
               <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
               <Form.Control
@@ -226,8 +230,8 @@ const Analytics: React.FC = () => {
           </Form.Group>
         </div>
 
-        <div className="flex justify-end space-x-3 w-[30%]">
-          <Form.Group controlId="validationSubmit" className="w-[30%]">
+        <div className="flex justify-end space-x-3 w-[30%] buttonBar">
+          <Form.Group controlId="validationSubmit" className="w-[30%] btn-bar">
             <Button
               className="search-btn btn-block"
               variant="primary"
@@ -237,7 +241,7 @@ const Analytics: React.FC = () => {
             </Button>
           </Form.Group>
 
-          <Form.Group controlId="validationReset" className="w-[30%]">
+          <Form.Group controlId="validationReset" className="w-[30%] btn-bar">
             <Button
               className="search-btn btn-block"
               variant="danger"

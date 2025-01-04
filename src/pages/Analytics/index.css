@@ -1,0 +1,17 @@
+@media screen and (max-width: 1024px) {
+  .tutorialBar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .selectionBar {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+}
+
+@media screen and (max-width: 702px) {
+  .page {
+    padding-top: 120px;
+  }
+}

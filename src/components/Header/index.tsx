@@ -15,14 +15,14 @@ export default function Header() {
     <header className="fixed top-0 left-0 w-full bg-blue-600 py-3 px-4 shadow-md z-50">
       <div className=" mx-auto flex justify-between items-center">
         {/* Logo */}
-        <div className="text-white font-bold text-lg">
+        <div className="text-white font-bold text-lg overflow-hidden whitespace-nowrap text-ellipsis">
           <Link to="/" className="text-white-important">
             AI-powered Study Planner
           </Link>
         </div>
 
         {user && (
-          <nav className="flex space-x-4">
+          <nav className="flex space-x-2">
             <Link
               to="/"
               className={`px-3 py-1 rounded-md ${
@@ -70,14 +70,14 @@ export default function Header() {
         <div className="space-x-4 relative">
           {user ? (
             <div className="flex items-center">
-              <span className="text-white mr-2">
+              <span className="hidden lg:inline text-white mr-2 ml-4 overflow-hidden whitespace-nowrap text-ellipsis">
                 Welcome, <span className="font-bold">{user.name}</span>!
               </span>
               <Link to="/profile">
                 <img
                   src={user.profilePicture || "/images/avt.jpg"}
                   alt="Profile"
-                  className="w-8 h-8 rounded-full cursor-pointer"
+                  className="hidden md:inline w-8 h-8 rounded-full cursor-pointer"
                 />
               </Link>
 
