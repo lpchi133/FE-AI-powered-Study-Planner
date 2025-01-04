@@ -5,7 +5,11 @@ import { TaskStatus } from "../types/task";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
 
-const SOCKET_URL = import.meta.env.VITE_ENDPOINT_URL; // Thay đổi URL nếu cần
+const SOCKET_URL = import.meta.env.VITE_ENDPOINT_URL;
+
+interface TaskOverdueData {
+  taskId: number;
+}
 
 export const useWebSocket = () => {
   const queryClient = useQueryClient();
@@ -16,7 +20,7 @@ export const useWebSocket = () => {
   });
 
   useEffect(() => {
-    socket.on("task-overdue", (data) => {
+    socket.on("task-overdue", (data: TaskOverdueData) => {
       console.log(`Task ${data.taskId} is overdue!`);
       //update task status to Overdue
       updateTask(data.taskId, { itemStatus: TaskStatus.Overdue });
