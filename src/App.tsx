@@ -16,7 +16,7 @@ import Todo from "./pages/NewTodo";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
 import ResetPassword from "./pages/ResetPassword";
-import Analytics from "./components/Analytics";
+import Analytics from "./pages/Analytics";
 
 function App() {
   const queryClient = new QueryClient();

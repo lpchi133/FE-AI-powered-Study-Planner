@@ -1,8 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import useAxios from "./useAxios";
-import { Task, TaskStatus, FocusSession } from "../types/task";
 import moment, { Moment } from "moment";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { Task, TaskStatus } from "../types/task";
+import useAxios from "./useAxios";
 
 
 type TasksContextType = {
@@ -14,7 +14,6 @@ type TasksContextType = {
   setSearch: (payload: Partial<SearchState>) => void;
   resetSearch: () => void;
   updateTask: (id: number, updatedTask: Partial<Task>) => void;
-  getFocusSessionsByTaskId: (taskId: number) => FocusSession[];
 };
 
 const TaskContext = createContext<TasksContextType>({
@@ -23,10 +22,9 @@ const TaskContext = createContext<TasksContextType>({
   getTaskIds: () => [],
   getTaskMap: () => ({}),
   getCompleteTaskIds: () => [],
-  setSearch: () => {},
-  resetSearch: () => {},
-  updateTask: () => {},
-  getFocusSessionsByTaskId: () => [],
+  setSearch: () => { },
+  resetSearch: () => { },
+  updateTask: () => { },
 });
 
 export type SearchState = {
@@ -70,7 +68,7 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         data.map(async (task) => {
           const dueDate = new Date(task.dueDateTime);
           let updatedStatus = task.itemStatus;
-  
+
           if (task.itemStatus !== TaskStatus.Completed) {
             if (new Date() > dueDate) {
               updatedStatus = TaskStatus.Overdue;
@@ -80,21 +78,21 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
               updatedStatus = TaskStatus.OnGoing;
             }
           }
-  
+
           if (updatedStatus !== task.itemStatus) {
             // Nếu trạng thái thay đổi, gửi yêu cầu API để cập nhật
             await post(`/tasks/updateTaskStatus`, { id: task.id, itemStatus: updatedStatus });
           }
-  
+
           return { ...task, itemStatus: updatedStatus };
         })
       );
-  
+
       return updatedTasks;
     },
     staleTime: 0, // Luôn làm mới dữ liệu
   });
-  
+
 
   const searchFunction = useCallback(
     (tasks: Task[]) => {
@@ -179,15 +177,6 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     [post, queryClient]
   );
 
-  const getFocusSessionsByTaskId = useCallback(
-    (taskId: number) => {
-      const task = getTaskById(taskId);
-      const focusSessions = task ? task.focusSessions : [];
-      return focusSessions;
-    },
-    [getTaskById]
-  );
-
   return (
     <TaskContext.Provider
       value={{
@@ -199,7 +188,6 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         setSearch,
         resetSearch,
         updateTask,
-        getFocusSessionsByTaskId,
       }}
     >
       {children}
