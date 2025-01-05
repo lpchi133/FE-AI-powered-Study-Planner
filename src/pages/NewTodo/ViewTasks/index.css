@@ -47,12 +47,6 @@ table {
   display: none !important;
 }
 
-svg {
-  position: absolute;
-  margin-top: -15px;
-  margin-left: 5px;
-}
-
 .sort-icon {
   position: relative;
   display: inline-block;
