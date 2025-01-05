@@ -36,19 +36,15 @@ const Toolbar = () => {
     <div>
       <Navbar collapseOnSelect variant="dark" className="fixedTop-1 mx-auto">
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Navbar.Collapse id="responsive-navbar-nav">
-          <Nav className="nav-2 mx-auto w-100">
-            <Form
-              className="d-flex flex-wrap justify-content-center w-100"
-              onSubmit={methods.handleSubmit(handleSubmit)}
-            >
-              <Form.Group
-                className="d-flex align-items-center mx-2 my-2"
-                style={{ width: "170px" }}
-                controlId="validationAddTask"
-              >
+        <Navbar.Collapse
+          id="responsive-navbar-nav"
+          className="responsive-navbar-nav"
+        >
+          <Nav className="nav-2 mx-auto">
+            <Form className="row" onSubmit={methods.handleSubmit(handleSubmit)}>
+              <Form.Group controlId="validationAddTask" className="addTask-btn">
                 <Button
-                  className="addtask-btn btn-block w-100"
+                  className="addtask-btn btn-block"
                   variant="primary"
                   onClick={() =>
                     events.openModal(EventKeys.addTaskModal, {
@@ -62,8 +58,7 @@ const Toolbar = () => {
 
               {/* Ô Search Tasks */}
               <Form.Group
-                className="d-flex align-items-center mx-2 my-2"
-                style={{ width: "360px" }}
+                className="searchBar"
                 controlId="validationSearchTasks"
               >
                 <InputGroup>
@@ -78,76 +73,67 @@ const Toolbar = () => {
                 </InputGroup>
               </Form.Group>
 
-              {/* From Date */}
-              <Form.Group
-                className="d-flex align-items-center mx-2 my-2"
-                style={{ width: "280px" }}
-                controlId="validationFromDate"
-              >
-                <InputGroup>
-                  <InputGroup.Text id="inputGroupPrepend1">
-                    From
-                  </InputGroup.Text>
-                  <Form.Control
-                    type="datetime-local"
-                    {...methods.register("fromDate")}
-                    aria-describedby="inputGroupPrepend1"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    Please choose a proper date.
-                  </Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              <div className="flex dateBar">
+                {/* From Date */}
+                <Form.Group className="fromDate" controlId="validationFromDate">
+                  <InputGroup>
+                    <InputGroup.Text id="inputGroupPrepend1">
+                      From
+                    </InputGroup.Text>
+                    <Form.Control
+                      type="datetime-local"
+                      {...methods.register("fromDate")}
+                      aria-describedby="inputGroupPrepend1"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      Please choose a proper date.
+                    </Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
+                {/* To Date */}
+                <Form.Group className="toDate" controlId="validationToDate">
+                  <InputGroup>
+                    <InputGroup.Text id="inputGroupPrepend2">
+                      To
+                    </InputGroup.Text>
+                    <Form.Control
+                      type="datetime-local"
+                      {...methods.register("toDate")}
+                      aria-describedby="inputGroupPrepend2"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      Please choose a proper date.
+                    </Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
+              </div>
 
-              {/* To Date */}
-              <Form.Group
-                className="d-flex align-items-center mx-2 my-2"
-                style={{ width: "260px" }}
-                controlId="validationToDate"
-              >
-                <InputGroup>
-                  <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
-                  <Form.Control
-                    type="datetime-local"
-                    {...methods.register("toDate")}
-                    aria-describedby="inputGroupPrepend2"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    Please choose a proper date.
-                  </Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              <div className=" flex buttonBar">
+                {/* Nút Submit */}
+                <Form.Group
+                  className="btn-bar mr-4"
+                  controlId="validationSubmit">
+                  <Button
+                    className="search-btn btn-block"
+                    variant="primary"
+                    type="submit"
+                  >
+                    <FontAwesomeIcon icon={faSearch} />
+                  </Button>
+                </Form.Group>
 
-              {/* Nút Submit */}
-              <Form.Group
-                className="d-flex align-items-center mx-2 my-2"
-                style={{ width: "90px" }}
-                controlId="validationSubmit"
-              >
-                <Button
-                  className="search-btn btn-block w-100"
-                  variant="primary"
-                  type="submit"
-                >
-                  <FontAwesomeIcon icon={faSearch} />
-                </Button>
-              </Form.Group>
-
-              {/* Nút Reset */}
-              <Form.Group
-                className="d-flex align-items-center mx-2 my-2"
-                style={{ width: "90px" }}
-                controlId="validationReset"
-              >
-                <Button
-                  className="search-btn btn-block w-100"
-                  variant="danger"
-                  type="reset"
-                  onClick={onRefresh}
-                >
-                  <FontAwesomeIcon icon={faRedoAlt} />
-                </Button>
-              </Form.Group>
+                {/* Nút Reset */}
+                <Form.Group className="btn-bar" controlId="validationReset">
+                  <Button
+                    className="search-btn btn-block"
+                    variant="danger"
+                    type="reset"
+                    onClick={onRefresh}
+                  >
+                    <FontAwesomeIcon icon={faRedoAlt} />
+                  </Button>
+                </Form.Group>
+              </div>
             </Form>
           </Nav>
         </Navbar.Collapse>

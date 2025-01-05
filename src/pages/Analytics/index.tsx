@@ -226,7 +226,7 @@ const Analytics: React.FC = () => {
   return (
     <div className="bg-blue-300 pt-24 px-16 pb-16 page">
       <Form
-        className="flex w-full justify-between mb-8"
+        className="flex w-full justify-between mb-8 tutorialBar"
         onSubmit={methods.handleSubmit(onSubmit)}
       >
         <div className="mr-24 w-[15%] selectionBar">
