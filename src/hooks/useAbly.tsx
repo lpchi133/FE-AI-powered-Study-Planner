@@ -37,8 +37,10 @@ export const useAbly = () => {
 
     // Cleanup when component unmounts
     return () => {
+      if (ablyClient.current?.connection.state === "connected") {
+        ablyClient.current?.close();
+      }
       channel.unsubscribe();
-      ablyClient.current?.close();
     };
   }, [user?.id, updateTask, queryClient]);
 };

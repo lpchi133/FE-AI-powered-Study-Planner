@@ -38,18 +38,23 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
     channel.subscribe("taskDeadlineReached", (message) => {
       const data = message.data as { taskId: number; message: string };
       if (data.taskId === task.id) {
-        handleFinish();
         setIsRunning(false);
+        setMode("focus");
+        setTimeLeft(initialFocusTime);
+        handleFinish();
+        setLabel("Start");
         task.itemStatus = TaskStatus.Overdue;
         toast.info(data.message);
       }
     });
 
     return () => {
+      if (ably.connection.state === "connected") {
+        ably.close();
+      }
       channel.unsubscribe();
-      ably.close();
     };
-  }, [task.id, initialFocusTime, handleFinish, onClose]);
+  }, [task.id, initialFocusTime, handleFinish, onClose, task]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
