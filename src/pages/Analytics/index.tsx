@@ -260,28 +260,23 @@ const Analytics: React.FC = () => {
               {tasks.length}
             </p>
           </div>
-          <div className="bg-white p-6 shadow rounded-lg">
-            <h2 className="text-lg font-bold text-gray-800">
-              Total Time Spent
-            </h2>
-            <p className="text-3xl font-semibold text-green-600">
+          <div className="bg-white p-6 shadow rounded-lg max-w-full break-words whitespace-normal">
+            <h2 className="text-lg font-bold text-gray-800">Total Time Spent</h2>
+            <p className="text-3xl font-semibold text-green-600 text-ellipsis overflow-hidden">
               {formatTime(taskSpentTime.totalTimeSpent)}
             </p>
           </div>
-          <div className="bg-white p-6 shadow rounded-lg">
-            <h2 className="text-lg font-bold text-gray-800">
-              Total Estimated Time
-            </h2>
-            <p className="text-3xl font-semibold text-red-600">
+          <div className="bg-white p-6 shadow rounded-lg max-w-full break-words whitespace-normal">
+            <h2 className="text-lg font-bold text-gray-800">Total Estimated Time</h2>
+            <p className="text-3xl font-semibold text-red-600 text-ellipsis overflow-hidden">
               {formatTime(taskSpentTime.totalEstimatedTime * 3600)}
-              {/* Convert hours to seconds */}
             </p>
           </div>
           <div className="bg-white p-6 shadow rounded-lg">
             <h2 className="text-lg font-bold text-gray-800">Tasks by Status</h2>
             <Pie data={tasksByStatusData} />
           </div>
-          <div className="bg-white shadow p-7 rounded-lg mt-8">
+          <div className="bg-white shadow p-6 rounded-lg">
             <h2 className="text-lg font-bold text-gray-800">
               Tasks by Priority
             </h2>
