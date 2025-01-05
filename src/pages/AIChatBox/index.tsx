@@ -38,7 +38,7 @@ export default function AIChatBox() {
         refetch();
       } // Fetch the data when the component mounts (if the user exists)
     }
-  }, [user?.id, refetch]);
+  }, [user?.id, refetch, data]);
 
   return (
     <div className="flex flex-col items-center pt-24 pb-16 min-h-screen bg-blue-300">
