@@ -29,7 +29,6 @@ const Toolbar = () => {
   };
 
   const handleSubmit = (data: SearchState) => {
-    console.log(data);
     setSearch(data);
   };
 

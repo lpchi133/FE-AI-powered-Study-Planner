@@ -3,14 +3,18 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import useAxios from "../../../hooks/useAxios";
 
-const AIFeedBack = () => {
+type Props = {
+  taskIds: number[];
+};
+
+const AIFeedBack = ({ taskIds }: Props) => {
   const { get } = useAxios();
 
   // Fetch AI suggestions with React Query
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["ai-suggestion-feed-back"], // Query key depends on user ID
+    queryKey: ["ai-suggestion-feed-back", taskIds], // Query key depends on user ID
     queryFn: async () => {
-      const response = await get(`/ai-suggestion/feed-back`);
+      const response = await get(`/ai-suggestion/feed-back`, { taskIds });
       return response;
     },
   });
