@@ -185,6 +185,7 @@ const Analytics: React.FC = () => {
       datasets: datasets,
     };
   }, [taskSpentTime.dailyTaskTimeSpent, taskMap]);
+  console.log("dailyTaskTimeSpentData", dailyTaskTimeSpentData)
 
   const focusTimePerTaskData = useMemo(() => {
     return {
@@ -389,13 +390,10 @@ const Analytics: React.FC = () => {
         <h2 className="text-lg font-bold text-gray-800">
           Time Spent on Each Task by Day
         </h2>
-        <div className="flex justify-center">
-          <div
-            style={{ height: "500px", width: "100%" }}
-            className="flex justify-center"
-          >
-            <Bar data={dailyTaskTimeSpentData} />
-          </div>
+        <div
+          className="flex justify-center"
+        >
+          <Bar data={dailyTaskTimeSpentData} />
         </div>
       </div>
 
@@ -404,25 +402,18 @@ const Analytics: React.FC = () => {
           User Focus Time per Task
         </h2>
         <div className="flex justify-center">
-          <div
-            style={{ height: "500px", width: "100%" }}
-            className="flex justify-center"
-          >
-            <Bar data={focusTimePerTaskData} />
-          </div>
+
+          <Bar data={focusTimePerTaskData} />
         </div>
       </div>
       <div className=" bg-white shadow p-7 rounded-lg mt-8">
         <h2 className="text-lg font-bold text-gray-800">
           Task Frequency Over Time
         </h2>
-        <div className="flex justify-center">
-          <div
-            style={{ height: "500px", width: "100%" }}
-            className="flex justify-center"
-          >
-            <Line data={overtimeTasksByMonthData} />
-          </div>
+        <div
+          className="flex justify-center"
+        >
+          <Line data={overtimeTasksByMonthData} />
         </div>
       </div>
     </div>
