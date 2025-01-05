@@ -4,7 +4,7 @@ import { Task, TaskStatus } from "../../types/task";
 import useAxios from "../../hooks/useAxios";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { io } from "socket.io-client";
+import Ably from "ably";
 
 interface FocusBreakTimerProps {
   initialFocusTime: number; // Focus time in seconds
@@ -27,34 +27,29 @@ const FocusBreakTimer: React.FC<FocusBreakTimerProps> = ({
   const [sessionId, setSessionId] = useState<number | null>(null);
   const { post, patch } = useAxios();
 
-  // WebSocket setup
+  // Ably setup
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_ENDPOINT_URL);
-
-    socket.on("connect", () => {
-      console.log("Connected to WebSocket server");
+    const ably = new Ably.Realtime({
+      key: import.meta.env.VITE_ABLY_API_KEY,
     });
 
-    socket.on(
-      "taskDeadlineReached",
-      (data: { taskId: number; message: string }) => {
-        if (data.taskId === task.id) {
-          setIsRunning(false);
-          setMode("focus");
-          setTimeLeft(initialFocusTime);
-          handleFinish();
-          setLabel("Start");
-          task.itemStatus = TaskStatus.Overdue;
-          toast.info(data.message);
-          onClose();
-        }
+    const channel = ably.channels.get("task-updates");
+
+    channel.subscribe("taskDeadlineReached", (message) => {
+      const data = message.data as { taskId: number; message: string };
+      if (data.taskId === task.id) {
+        handleFinish();
+        setIsRunning(false);
+        task.itemStatus = TaskStatus.Overdue;
+        toast.info(data.message);
       }
-    );
+    });
 
     return () => {
-      socket.disconnect();
+      channel.unsubscribe();
+      ably.close();
     };
-  }, [task.id, handleFinish, initialFocusTime]);
+  }, [task.id, initialFocusTime, handleFinish, onClose]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;

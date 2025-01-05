@@ -18,8 +18,10 @@
     "@heroicons/react": "^2.2.0",
     "@react-email/components": "^0.0.31",
     "@tanstack/react-query": "^5.62.7",
+    "@types/ably": "^1.0.0",
     "@types/lodash": "^4.17.14",
     "@types/node": "^22.10.2",
+    "ably": "^2.6.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",
@@ -40,7 +42,6 @@
     "react-toastify": "^11.0.2",
     "remark-gfm": "^4.0.0",
     "resend": "^4.0.1",
-    "socket.io-client": "^4.8.1",
     "uuid": "^11.0.3"
   },
   "devDependencies": {

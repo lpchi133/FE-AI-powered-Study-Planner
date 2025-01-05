@@ -1,3 +1,4 @@
+import { useAbly } from "../../../hooks/useAbly";
 import useTasks from "../../../hooks/useTasksContext";
 import ArchiveList from "../ArchiveList";
 import TaskList from "../TaskList";
@@ -6,6 +7,8 @@ import Toolbar from "../Toolbar";
 const ViewTasks = () => {
   const { getTaskIds } = useTasks();
   const taskIds = getTaskIds(true);
+
+  useAbly();
 
   return (
     <div className="bg-blue-200 pt-1 pb-0 mb-0 min-h-screen overflow-hidden">
