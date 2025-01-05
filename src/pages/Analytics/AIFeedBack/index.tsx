@@ -26,18 +26,16 @@ const AIFeedBack = ({ taskIds }: Props) => {
           <div className="text-xl font-bold text-blue-600 mb-2">
             ✨ AI-powered Feedback:
           </div>
-          <div className="flex flex-col items-start max-h-[500px] overflow-y-auto ">
+          <div>
             <div className="mr-2">
               {isLoading && (
-                <div className="w-full flex items-center justify-center">
-                  <div
-                    className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                    role="status"
-                  >
-                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                      Loading...
-                    </span>
-                  </div>
+                <div className="flex justify-center items-center space-x-2">
+                  <div className="w-5 h-5 bg-blue-500 rounded-full animate-bounce"></div>
+                  <div className="w-5 h-5 bg-blue-500 rounded-full animate-bounce delay-150"></div>
+                  <div className="w-5 h-5 bg-blue-500 rounded-full animate-bounce delay-300"></div>
+                  <p className="text-gray-500 ml-3">
+                    Loading AI suggestions...
+                  </p>
                 </div>
               )}
               {isError && (
@@ -46,7 +44,11 @@ const AIFeedBack = ({ taskIds }: Props) => {
                   {error.message}
                 </div>
               )}
-              {data && <Markdown remarkPlugins={[remarkGfm]}>{data}</Markdown>}
+              <div className="flex flex-col items-start max-h-[500px] overflow-y-auto">
+                {data && (
+                  <Markdown remarkPlugins={[remarkGfm]}>{data}</Markdown>
+                )}
+              </div>
             </div>
           </div>
         </div>
