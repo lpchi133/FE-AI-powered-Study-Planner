@@ -22,7 +22,7 @@ const ArchiveList = () => {
             >
                 <Card>
                     <Card.Header>
-                            <div className='flex'  onClick={toggleAccordion}>
+                            <div className='flex  border-radius: 1rem'  onClick={toggleAccordion}>
                                 <h2>Archive</h2>
                                 <FontAwesomeIcon icon={isOpen? faAngleDown:faAngleUp}  />
                               

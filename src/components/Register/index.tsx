@@ -27,6 +27,7 @@ const Register = () => {
     mutationFn: async (data: RegisterData) => {
       setLoading(true);
       const response = await post("/auth/register", data);
+      console.log(response.message);
       return response.data;
     },
     onSuccess: () => {

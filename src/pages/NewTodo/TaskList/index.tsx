@@ -13,6 +13,7 @@ import { useState } from "react";
 import { TaskPriority, TaskStatus, type Task } from "../../../types/task";
 
 import moment from "moment";
+import { useWebSocket } from "../../../hooks/useWebSocket";
 
 type Props = {
   taskIds: number[];
@@ -39,6 +40,8 @@ const TaskList = ({ taskIds, isArchive, emptyCaption }: Props) => {
       dueDateTime: "asc",
     },
   });
+
+  useWebSocket();
 
   const getSortIcon = (val: string) => {
     if (state.currentSort === val) {

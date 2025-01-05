@@ -11,18 +11,12 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import useAxios from "../../hooks/useAxios";
 import useTasks from "../../hooks/useTasksContext";
-import { Task, TaskPriority } from "../../types/task";
+import { Task, TaskPriority, TaskStatus } from "../../types/task";
 import FocusBreakTimer from "../../components/FocusBreakTimer";
 import { useTimer } from "../../hooks/useTimerContext";
 import { toast } from "react-toastify";
 
 const DragAndDropCalendar = withDragAndDrop<Task>(Calendar);
-
-const priorityColors: Record<string, string> = {
-  [TaskPriority.High]: "#ef4444",
-  [TaskPriority.Medium]: "#eab308",
-  [TaskPriority.Low]: "#22c55e",
-};
 
 const DnDCalendar: React.FC = () => {
   const { post } = useAxios();
@@ -183,14 +177,30 @@ const DnDCalendar: React.FC = () => {
 
   const localizer = momentLocalizer(moment);
 
+  const statusColors: Record<string, string> = {
+    [TaskStatus.Overdue]: "#ef4444", // Red
+    [TaskStatus.Completed]: "#22c55e", // Green
+    [TaskStatus.NotStarted]: "#9ca3af", // Gray
+    [TaskStatus.OnGoing]: "#3b82f6", // Blue
+  };
+
+  const priorityBorderColors: Record<string, string> = {
+    [TaskPriority.Low]: "#22c55e", // Green
+    [TaskPriority.Medium]: "#eab308", // Yellow
+    [TaskPriority.High]: "#ef4444", // Red
+  };
+
   const eventStyleGetter = (event: Task) => {
-    const priorityColor = priorityColors[event.itemPriority] || "#d1d5db";
+    const backgroundColor = statusColors[event.itemStatus] || "#d1d5db"; // Default to gray
+    const borderColor =
+      priorityBorderColors[event.itemPriority] || "transparent";
+
     return {
       style: {
-        backgroundColor: priorityColor,
+        backgroundColor,
         color: "white",
         padding: "0px 5px",
-        border: "none",
+        border: `2px solid ${borderColor}`, // Border for priority
         borderRadius: "5px",
       },
     };
@@ -332,10 +342,86 @@ const DnDCalendar: React.FC = () => {
                   initialFocusTime={(selectedTask.focusTime ?? 25) * 60} // Convert minutes to seconds
                   initialBreakTime={(selectedTask.breakTime ?? 5) * 60} // Convert minutes to seconds
                   task={selectedTask}
+                  onClose={handleClosePopup}
                 />
               </div>
             </div>
           )}
+          <div className="mt-4">
+            <h4 className="font-semibold text-lg mb-4">Legend</h4>
+
+            {/* Status Legend */}
+            <div className="mb-4">
+              <h5 className="font-medium mb-2">Status Colors:</h5>
+              <ul className="flex space-x-4">
+                <li className="flex items-center">
+                  <span
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{ backgroundColor: "#ef4444" }}
+                  ></span>
+                  Overdue
+                </li>
+                <li className="flex items-center">
+                  <span
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{ backgroundColor: "#22c55e" }}
+                  ></span>
+                  Completed
+                </li>
+                <li className="flex items-center">
+                  <span
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{ backgroundColor: "#9ca3af" }}
+                  ></span>
+                  Not Started
+                </li>
+                <li className="flex items-center">
+                  <span
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{ backgroundColor: "#3b82f6" }}
+                  ></span>
+                  Ongoing
+                </li>
+              </ul>
+            </div>
+
+            {/* Priority Legend */}
+            <div>
+              <h5 className="font-medium mb-2">Priority Borders:</h5>
+              <ul className="flex space-x-4">
+                <li className="flex items-center">
+                  <span
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{
+                      border: "2px solid #22c55e",
+                      backgroundColor: "transparent",
+                    }}
+                  ></span>
+                  Low Priority
+                </li>
+                <li className="flex items-center">
+                  <span
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{
+                      border: "2px solid #eab308",
+                      backgroundColor: "transparent",
+                    }}
+                  ></span>
+                  Medium Priority
+                </li>
+                <li className="flex items-center">
+                  <span
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{
+                      border: "2px solid #ef4444",
+                      backgroundColor: "transparent",
+                    }}
+                  ></span>
+                  High Priority
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </DndProvider>
     </div>
