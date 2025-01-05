@@ -185,7 +185,7 @@ const Analytics: React.FC = () => {
       datasets: datasets,
     };
   }, [taskSpentTime.dailyTaskTimeSpent, taskMap]);
-  console.log("dailyTaskTimeSpentData", dailyTaskTimeSpentData)
+  console.log("dailyTaskTimeSpentData", dailyTaskTimeSpentData);
 
   const focusTimePerTaskData = useMemo(() => {
     return {
@@ -353,20 +353,29 @@ const Analytics: React.FC = () => {
             </p>
           </div>
           <div className="bg-white p-6 shadow rounded-lg max-w-full break-words whitespace-normal">
-            <h2 className="text-lg font-bold text-gray-800">Total Time Spent</h2>
+            <h2 className="text-lg font-bold text-gray-800">
+              Total Time Spent
+            </h2>
             <p className="text-3xl font-semibold text-green-600 text-ellipsis overflow-hidden">
               {formatTime(taskSpentTime.totalTimeSpent)}
             </p>
           </div>
           <div className="bg-white p-6 shadow rounded-lg max-w-full break-words whitespace-normal">
-            <h2 className="text-lg font-bold text-gray-800">Total Estimated Time</h2>
+            <h2 className="text-lg font-bold text-gray-800">
+              Total Estimated Time
+            </h2>
             <p className="text-3xl font-semibold text-red-600 text-ellipsis overflow-hidden">
               {formatTime(taskSpentTime.totalEstimatedTime * 3600)}
             </p>
           </div>
           <div className="bg-white p-6 shadow rounded-lg">
             <h2 className="text-lg font-bold text-gray-800">Tasks by Status</h2>
-            <Pie data={tasksByStatusData} />
+            <div
+              style={{ height: "200px", width: "100%" }}
+              className="flex justify-center"
+            >
+              <Pie data={tasksByStatusData} />
+            </div>
           </div>
           <div className="bg-white shadow p-6 rounded-lg">
             <h2 className="text-lg font-bold text-gray-800">
@@ -380,7 +389,6 @@ const Analytics: React.FC = () => {
                 <Bar data={tasksByPriorityData} />
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -390,9 +398,7 @@ const Analytics: React.FC = () => {
         <h2 className="text-lg font-bold text-gray-800">
           Time Spent on Each Task by Day
         </h2>
-        <div
-          className="flex justify-center"
-        >
+        <div className="flex justify-center">
           <Bar data={dailyTaskTimeSpentData} />
         </div>
       </div>
@@ -402,7 +408,6 @@ const Analytics: React.FC = () => {
           User Focus Time per Task
         </h2>
         <div className="flex justify-center">
-
           <Bar data={focusTimePerTaskData} />
         </div>
       </div>
@@ -410,9 +415,7 @@ const Analytics: React.FC = () => {
         <h2 className="text-lg font-bold text-gray-800">
           Task Frequency Over Time
         </h2>
-        <div
-          className="flex justify-center"
-        >
+        <div className="flex justify-center">
           <Line data={overtimeTasksByMonthData} />
         </div>
       </div>
