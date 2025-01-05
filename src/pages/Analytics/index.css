@@ -1,0 +1,23 @@
+@media screen and (max-width: 1250px) {
+  .tutorialBar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .selectionBar {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+}
+
+@media screen and (max-width: 756px) {
+  .page {
+    padding-top: 120px;
+  }
+}
+
+@media screen and (max-width: 710px) {
+  .page {
+    padding-top: 145px;
+  }
+}

@@ -41,7 +41,11 @@ export default function Header() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+                  d={
+                    menuOpen
+                      ? "M6 18L18 6M6 6l12 12"
+                      : "M4 6h16M4 12h16M4 18h16"
+                  }
                 />
               </svg>
             </button>
@@ -99,7 +103,7 @@ export default function Header() {
         )}
 
         {/* User profile / Auth links */}
-        <div className="space-x-4 relative">
+        <div className="space-x-4 relative ml-2">
           {user ? (
             <div className="flex items-center text-lg">
               <span className="text-white mr-2">
@@ -109,7 +113,7 @@ export default function Header() {
                 <img
                   src={user.profilePicture || "/images/avt.jpg"}
                   alt="Profile"
-                  className="w-8 h-8 rounded-full cursor-pointer"
+                  className="hidden custom1:inline w-8 h-8 rounded-full cursor-pointer"
                 />
               </Link>
 

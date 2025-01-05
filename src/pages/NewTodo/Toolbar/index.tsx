@@ -29,7 +29,6 @@ const Toolbar = () => {
   };
 
   const handleSubmit = (data: SearchState) => {
-    console.log(data);
     setSearch(data);
   };
 
@@ -39,8 +38,15 @@ const Toolbar = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="nav-2 mx-auto w-100">
-            <Form className="d-flex flex-wrap justify-content-center w-100" onSubmit={methods.handleSubmit(handleSubmit)}>
-              <Form.Group className="d-flex align-items-center mx-2 my-2" style={{ width: "170px" }} controlId="validationAddTask">
+            <Form
+              className="d-flex flex-wrap justify-content-center w-100"
+              onSubmit={methods.handleSubmit(handleSubmit)}
+            >
+              <Form.Group
+                className="d-flex align-items-center mx-2 my-2"
+                style={{ width: "170px" }}
+                controlId="validationAddTask"
+              >
                 <Button
                   className="addtask-btn btn-block w-100"
                   variant="primary"
@@ -55,7 +61,11 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* Ô Search Tasks */}
-              <Form.Group className="d-flex align-items-center mx-2 my-2" style={{ width: "360px" }} controlId="validationSearchTasks">
+              <Form.Group
+                className="d-flex align-items-center mx-2 my-2"
+                style={{ width: "360px" }}
+                controlId="validationSearchTasks"
+              >
                 <InputGroup>
                   <InputGroup.Text id="inputGroupSearchTasks">
                     Search
@@ -69,7 +79,11 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* From Date */}
-              <Form.Group className="d-flex align-items-center mx-2 my-2" style={{ width: "280px" }} controlId="validationFromDate">
+              <Form.Group
+                className="d-flex align-items-center mx-2 my-2"
+                style={{ width: "280px" }}
+                controlId="validationFromDate"
+              >
                 <InputGroup>
                   <InputGroup.Text id="inputGroupPrepend1">
                     From
@@ -86,7 +100,11 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* To Date */}
-              <Form.Group className="d-flex align-items-center mx-2 my-2" style={{ width: "260px" }} controlId="validationToDate">
+              <Form.Group
+                className="d-flex align-items-center mx-2 my-2"
+                style={{ width: "260px" }}
+                controlId="validationToDate"
+              >
                 <InputGroup>
                   <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
                   <Form.Control
@@ -101,7 +119,11 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* Nút Submit */}
-              <Form.Group className="d-flex align-items-center mx-2 my-2" style={{ width: "90px" }} controlId="validationSubmit">
+              <Form.Group
+                className="d-flex align-items-center mx-2 my-2"
+                style={{ width: "90px" }}
+                controlId="validationSubmit"
+              >
                 <Button
                   className="search-btn btn-block w-100"
                   variant="primary"
@@ -112,7 +134,11 @@ const Toolbar = () => {
               </Form.Group>
 
               {/* Nút Reset */}
-              <Form.Group className="d-flex align-items-center mx-2 my-2" style={{ width: "90px" }} controlId="validationReset">
+              <Form.Group
+                className="d-flex align-items-center mx-2 my-2"
+                style={{ width: "90px" }}
+                controlId="validationReset"
+              >
                 <Button
                   className="search-btn btn-block w-100"
                   variant="danger"

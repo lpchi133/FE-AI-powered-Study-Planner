@@ -1,32 +1,68 @@
-import { faRedoAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "chart.js/auto";
 import _ from "lodash";
 import moment from "moment";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { Bar, Line, Pie } from "react-chartjs-2";
+import { useForm } from "react-hook-form";
 import useTasks from "../../hooks/useTasksContext";
 import { Task, TaskStatus } from "../../types/task";
 import { formatTime } from "../../utils/helpers";
 import AIFeedBack from "./AIFeedBack";
+import "./index.css";
+
+export enum AnalyticsFilter {
+  TODAY = "today",
+  THIS_WEEK = "this-week",
+  THIS_MONTH = "this-month",
+  THIS_YEAR = "this-year",
+  CUSTOM = "custom",
+}
+type AnalyticFilter = {
+  type: AnalyticsFilter;
+  startDate: string;
+  endDate: string;
+};
 
 const Analytics: React.FC = () => {
-  const { tasks, getTaskMap } = useTasks();
+  const { tasks } = useTasks();
+  const [activeFilterType, setActiveFilterType] = useState<AnalyticFilter>({
+    type: AnalyticsFilter.TODAY,
+    startDate: moment().toISOString(),
+    endDate: moment().toISOString(),
+  });
+  const methods = useForm<{ filter: AnalyticFilter }>({
+    defaultValues: {
+      filter: activeFilterType,
+    },
+  });
 
-  const taskMap = getTaskMap();
+  const filterType = methods.watch("filter.type");
+  const filteredTasks = useMemo(() => {
+    const { startDate, endDate } = activeFilterType;
+    return tasks.filter((task) => {
+      const dueDate = moment(task.dueDateTime);
+      return dueDate.isBetween(startDate, endDate, "day", "[]");
+    });
+  }, [tasks, activeFilterType]);
+  const taskMap = useMemo(() => {
+    return _.keyBy(filteredTasks, "id");
+  }, [filteredTasks]);
+
   const analyticsStatusData = useMemo(() => {
-    return _.groupBy(tasks, "itemStatus");
-  }, [tasks]);
+    return _.groupBy(filteredTasks, "itemStatus");
+  }, [filteredTasks]);
   const analyticsPriorityData = useMemo(() => {
-    return _.groupBy(tasks, "itemPriority");
-  }, [tasks]);
+    return _.groupBy(filteredTasks, "itemPriority");
+  }, [filteredTasks]);
 
   const taskSpentTime = useMemo(() => {
     const dailyTaskTimeSpent: Record<string, Record<string, number>> = {};
     let totalTimeSpent = 0;
     let totalEstimatedTime = 0;
-    tasks.forEach((task) => {
+    filteredTasks.forEach((task) => {
       // Calculate the total duration of focusSessions in seconds
       const focusSessions = task?.focusSessions || [];
       focusSessions.forEach((session) => {
@@ -53,10 +89,10 @@ const Analytics: React.FC = () => {
       totalTimeSpent,
       totalEstimatedTime,
     };
-  }, [tasks]);
+  }, [filteredTasks]);
 
   const focusTimePerTask = useMemo(() => {
-    return tasks.reduce(
+    return filteredTasks.reduce(
       (acc, task) => {
         const focusSessions = task?.focusSessions || [];
         const focusTime = focusSessions.reduce(
@@ -74,10 +110,10 @@ const Analytics: React.FC = () => {
       },
       {} as Record<string, number>
     );
-  }, [tasks]);
+  }, [filteredTasks]);
 
   const overtimeTasksByMonth = useMemo(() => {
-    return tasks.reduce(
+    return filteredTasks.reduce(
       (acc, task) => {
         const dueDate = moment(task.dueDateTime);
         const month = dueDate.format("YYYY-MM");
@@ -91,7 +127,7 @@ const Analytics: React.FC = () => {
       },
       {} as Record<string, Task[]>
     );
-  }, [tasks]);
+  }, [filteredTasks]);
   const tasksByStatusData = useMemo(() => {
     return {
       labels: Object.keys(analyticsStatusData),
@@ -182,52 +218,119 @@ const Analytics: React.FC = () => {
     };
   }, [overtimeTasksByMonth]);
 
+  const onSubmit = (data: { filter: AnalyticFilter }) => {
+    setActiveFilterType(data.filter);
+  };
+
   return (
-    <div className="bg-blue-300 pt-24 px-16 pb-16">
-      <div className="flex w-full">
-        <div className="mr-24 w-[15%]">
-          <Form.Group controlId="validationSelect">
-            <Form.Select aria-label="Select time range" className="form-select">
-              <option value="1">Today</option>
-              <option value="2">This week</option>
-              <option value="3">This month</option>
-              <option value="4">This year</option>
+    <div className="bg-blue-300 pt-24 px-16 pb-16 page">
+      <Form
+        className="flex w-full justify-between mb-8"
+        onSubmit={methods.handleSubmit(onSubmit)}
+      >
+        <div className="mr-24 w-[15%] selectionBar">
+          <Form.Group>
+            <Form.Select
+              aria-label="Select time range"
+              className="form-select"
+              {...methods.register("filter.type", {
+                onChange: (e) => {
+                  switch (e.target.value) {
+                    case AnalyticsFilter.TODAY:
+                      methods.setValue(
+                        "filter.startDate",
+                        moment().toISOString()
+                      );
+                      methods.setValue(
+                        "filter.endDate",
+                        moment().toISOString()
+                      );
+                      break;
+                    case AnalyticsFilter.THIS_WEEK:
+                      methods.setValue(
+                        "filter.startDate",
+                        moment().startOf("week").toISOString()
+                      );
+                      methods.setValue(
+                        "filter.endDate",
+                        moment().endOf("week").toISOString()
+                      );
+                      break;
+                    case AnalyticsFilter.THIS_MONTH:
+                      methods.setValue(
+                        "filter.startDate",
+                        moment().startOf("month").toISOString()
+                      );
+                      methods.setValue(
+                        "filter.endDate",
+                        moment().endOf("month").toISOString()
+                      );
+                      break;
+                    case AnalyticsFilter.THIS_YEAR:
+                      methods.setValue(
+                        "filter.startDate",
+                        moment().startOf("year").toISOString()
+                      );
+                      methods.setValue(
+                        "filter.endDate",
+                        moment().endOf("year").toISOString()
+                      );
+                      break;
+                    case AnalyticsFilter.CUSTOM:
+                      break;
+                  }
+                },
+              })}
+            >
+              <option value={AnalyticsFilter.TODAY}>Today</option>
+              <option value={AnalyticsFilter.THIS_WEEK}>This week</option>
+              <option value={AnalyticsFilter.THIS_MONTH}>This month</option>
+              <option value={AnalyticsFilter.THIS_YEAR}>This year</option>
+              <option value={AnalyticsFilter.CUSTOM}>Custom</option>
             </Form.Select>
           </Form.Group>
         </div>
+        {filterType === AnalyticsFilter.CUSTOM && (
+          <div className="flex space-x-3 mr-48 w-[36%] dateBar">
+            <Form.Group
+              controlId="validationFromDate"
+              className="w-[280px] fromDate"
+            >
+              <InputGroup>
+                <InputGroup.Text id="inputGroupPrepend1">From</InputGroup.Text>
+                <Form.Control
+                  type="datetime-local"
+                  {...methods.register("filter.startDate")}
+                  aria-describedby="inputGroupPrepend1"
+                />
+                <Form.Control.Feedback type="invalid">
+                  Please choose a proper date.
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
 
-        <div className="flex space-x-3 mr-48 w-[36%]">
-          <Form.Group controlId="validationFromDate" className="w-[280px]">
-            <InputGroup>
-              <InputGroup.Text id="inputGroupPrepend1">From</InputGroup.Text>
-              <Form.Control
-                type="datetime-local"
-                // {...methods.register("fromDate")}
-                aria-describedby="inputGroupPrepend1"
-              />
-              <Form.Control.Feedback type="invalid">
-                Please choose a proper date.
-              </Form.Control.Feedback>
-            </InputGroup>
-          </Form.Group>
+            <Form.Group
+              controlId="validationToDate"
+              className="w-[260px] toDate"
+            >
+              <InputGroup>
+                <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
+                <Form.Control
+                  type="datetime-local"
+                  // {...methods.register("toDate")}
+                  {...methods.register("filter.endDate")}
+                  aria-describedby="inputGroupPrepend2"
+                />
+                <Form.Control.Feedback type="invalid">
+                  Please choose a proper date.
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
+          </div>
+        )}
 
-          <Form.Group controlId="validationToDate" className="w-[260px]">
-            <InputGroup>
-              <InputGroup.Text id="inputGroupPrepend2">To</InputGroup.Text>
-              <Form.Control
-                type="datetime-local"
-                // {...methods.register("toDate")}
-                aria-describedby="inputGroupPrepend2"
-              />
-              <Form.Control.Feedback type="invalid">
-                Please choose a proper date.
-              </Form.Control.Feedback>
-            </InputGroup>
-          </Form.Group>
-        </div>
-
-        <div className="flex justify-end space-x-3 w-[30%]">
-          <Form.Group controlId="validationSubmit" className="w-[30%]">
+        <div className="flex justify-end space-x-3 w-[30%] buttonBar">
+          <Form.Group controlId="validationSubmit" className="w-[30%] btn-bar">
             <Button
               className="search-btn btn-block"
               variant="primary"
@@ -236,20 +339,8 @@ const Analytics: React.FC = () => {
               <FontAwesomeIcon icon={faSearch} />
             </Button>
           </Form.Group>
-
-          <Form.Group controlId="validationReset" className="w-[30%]">
-            <Button
-              className="search-btn btn-block"
-              variant="danger"
-              type="reset"
-
-              // onClick={onRefresh}
-            >
-              <FontAwesomeIcon icon={faRedoAlt} />
-            </Button>
-          </Form.Group>
         </div>
-      </div>
+      </Form>
 
       <div className=" bg-white shadow p-7 rounded-lg mt-8">
         <h1 className="text-3xl font-bold mb-6 text-center">Board</h1>
@@ -257,7 +348,7 @@ const Analytics: React.FC = () => {
           <div className="bg-white p-6 shadow rounded-lg">
             <h2 className="text-lg font-bold text-gray-800">Total Tasks</h2>
             <p className="text-3xl font-semibold text-blue-600">
-              {tasks.length}
+              {filteredTasks.length}
             </p>
           </div>
           <div className="bg-white p-6 shadow rounded-lg max-w-full break-words whitespace-normal">
@@ -292,7 +383,7 @@ const Analytics: React.FC = () => {
           </div>
         </div>
       </div>
-      <AIFeedBack />
+      <AIFeedBack taskIds={filteredTasks.map((task) => task.id)} />
 
       <div className=" bg-white shadow p-7 rounded-lg mt-8">
         <h2 className="text-lg font-bold text-gray-800">

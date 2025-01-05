@@ -79,7 +79,6 @@ const TaskList = ({ taskIds, isArchive, emptyCaption }: Props) => {
         };
         const priorityA = priorityOrder[valueA as TaskPriority] || 0;
         const priorityB = priorityOrder[valueB as TaskPriority] || 0;
-        console.log(" A", priorityA, " b", priorityB, " ->", valueA, aTask);
 
         // So sánh theo thứ tự ưu tiên, HIGH > MEDIUM > LOW
         return order === "desc" ? priorityB - priorityA : priorityA - priorityB;

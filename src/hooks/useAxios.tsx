@@ -50,11 +50,11 @@ const useAxios = () => {
       throw error;
     }
   };
-  const get = async (url: string, headers?: object) => {
+  const get = async (url: string, params?: object) => {
     try {
-      const response = await instance.get(url, {
-        headers: {
-          ...(headers || {}),
+      const response = await instance.get(`${url}`, {
+        params: {
+          ...(params || {}),
         },
       });
       return response.data;
@@ -63,6 +63,7 @@ const useAxios = () => {
       throw error;
     }
   };
+
   const put = async (url: string, data: unknown, headers?: object) => {
     try {
       const response = await instance.put(url, data, {
