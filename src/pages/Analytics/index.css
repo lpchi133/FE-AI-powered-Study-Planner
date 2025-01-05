@@ -1,4 +1,4 @@
-@media screen and (max-width: 1250px) {
+@media screen and (max-width: 1024px) {
   .tutorialBar {
     display: flex;
     flex-direction: column;
@@ -10,14 +10,8 @@
   }
 }
 
-@media screen and (max-width: 756px) {
+@media screen and (max-width: 702px) {
   .page {
     padding-top: 120px;
-  }
-}
-
-@media screen and (max-width: 710px) {
-  .page {
-    padding-top: 145px;
   }
 }
