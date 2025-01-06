@@ -15,3 +15,23 @@
     padding-top: 120px;
   }
 }
+
+.chart-container {
+  width: 100%;
+  height: auto;
+  max-height: 400px; /* Adjust this value as needed */
+}
+
+.chart-title {
+  font-size: 1.25rem; /* Default font size */
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    max-height: 200px; /* Adjust this value for smaller screens */
+  }
+
+  .chart-title {
+    font-size: 1rem; /* Smaller font size for smaller screens */
+  }
+}
