@@ -44,7 +44,7 @@ const config = {
         },
         color: "#2F4F4F",
       },
-      display: false,
+      display: true,
     },
     title: {
       text: "User Focus Time per Task",
@@ -58,35 +58,26 @@ const config = {
 };
 
 type BarChartProps = {
-  focusTimePerTaskData: {
-    labels: string[]; // Danh sách tên task
-    datasets: { label: string; data: number[] }[]; // Một dataset duy nhất cho tất cả các task
+  dailyTaskTimeSpentData: {
+    labels: string[];
+    datasets: { label: string; data: number[]; stack: string }[];
   };
 };
 
-export default function BarChart({ focusTimePerTaskData }: BarChartProps) {
-  // Mảng màu cho mỗi task
-  const colors = [
-    Utils.CHART_COLORS.red,
-    Utils.CHART_COLORS.blue,
-    Utils.CHART_COLORS.green,
-    Utils.CHART_COLORS.yellow,
-    Utils.CHART_COLORS.orange,
-  ];
-
+export default function BarChart1({ dailyTaskTimeSpentData }: BarChartProps) {
   // Tạo dữ liệu cho bar chart
   const barData = {
-    labels: focusTimePerTaskData.labels, // Gắn labels từ props (ví dụ: "Task A", "Task B", ...)
-    datasets: [
-      {
-        label: "Focus Time", // Nhãn chung cho tất cả các dataset (có thể thay đổi nếu cần)
-        data: focusTimePerTaskData.datasets[0].data, // Dữ liệu của tất cả các task
-        borderColor: colors, // Màu đường viền riêng cho từng cột
-        backgroundColor: colors.map((color) =>
-          Utils.transparentize(color, 0.5)
-        ), // Màu nền riêng cho từng cột
-      },
-    ],
+    labels: dailyTaskTimeSpentData.labels, // Sử dụng labels từ dailyTaskTimeSpentData
+    datasets: dailyTaskTimeSpentData.datasets.map((dataset, index) => ({
+      label: dataset.label, // Nhãn của dataset
+      data: dataset.data, // Dữ liệu của dataset
+      stack: dataset.stack, // Thêm thuộc tính stack cho mỗi dataset
+      borderColor: Object.values(Utils.CHART_COLORS)[index % 5], // Màu viền (xoay vòng)
+      backgroundColor: Utils.transparentize(
+        Object.values(Utils.CHART_COLORS)[index % 5],
+        0.5
+      ), // Màu nền (xoay vòng với độ trong suốt)
+    })),
   };
 
   return (

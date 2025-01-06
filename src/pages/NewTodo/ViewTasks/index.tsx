@@ -11,7 +11,7 @@ const ViewTasks = () => {
   useAbly();
 
   return (
-    <div className="bg-blue-200 pt-1 pb-0 mb-0 min-h-screen overflow-hidden">
+    <div className="bg-blue-300 pt-1 pb-0 mb-0 min-h-screen overflow-hidden">
       <Toolbar />
       <div className="flex flex-col items-center mb-0">
         <h1 className="text-3xl font-bold mt-2 mb-0">Task List</h1>

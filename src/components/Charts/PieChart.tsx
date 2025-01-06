@@ -5,10 +5,6 @@ ChartJS.register(ArcElement, Title, Tooltip, Legend);
 
 // Fake Utils object để mô phỏng dữ liệu, cần thay thế bằng Utils thực tế nếu có
 const Utils = {
-  numbers: ({ count, min, max }: { count: number; min: number; max: number }) =>
-    Array.from({ length: count }, () =>
-      Math.floor(Math.random() * (max - min + 1) + min)
-    ),
   CHART_COLORS: {
     red: "rgb(255, 99, 132)",
     orange: "rgb(255, 159, 64)",
@@ -16,20 +12,6 @@ const Utils = {
     green: "rgb(75, 192, 192)",
     blue: "rgb(54, 162, 235)",
   },
-};
-
-const DATA_COUNT = 4;
-const NUMBER_CFG = { count: DATA_COUNT, min: 0, max: 100 };
-
-const data = {
-  labels: ["Not started", "Over due", "Pending", "On going"],
-  datasets: [
-    {
-      label: "This month",
-      data: Utils.numbers(NUMBER_CFG),
-      backgroundColor: Object.values(Utils.CHART_COLORS),
-    },
-  ],
 };
 
 const config = {
@@ -44,21 +26,34 @@ const config = {
         color: "#2F4F4F",
       },
     },
-    title: {
-      display: true,
-      text: "Task Status Distribution",
-      font: {
-        size: 24,
-      },
-      color: "#000000",
-    },
   },
 };
 
-export default function PieChart() {
+type PieChartProps = {
+  tasksByStatusData: {
+    labels: string[];
+    datasets: { label: string; data: number[] }[];
+  };
+};
+
+export default function PieChart({ tasksByStatusData }: PieChartProps) {
+  const pieData = {
+    labels: tasksByStatusData.labels, // Lấy labels từ props
+    datasets: [
+      {
+        label: tasksByStatusData.datasets[0].label, // Lấy label từ props
+        data: tasksByStatusData.datasets[0].data, // Lấy data từ props
+        backgroundColor: Object.values(Utils.CHART_COLORS), // Màu sắc biểu đồ
+      },
+    ],
+  };
+
   return (
-    <div style={{ height: "500px", width: "500px" }}>
-      <Pie data={data} options={config} />
+    <div
+      style={{ height: "200px", width: "100%" }}
+      className="flex justify-center"
+    >
+      <Pie data={pieData} options={config} />
     </div>
   );
 }

@@ -20,65 +20,7 @@ ChartJS.register(
   Legend
 );
 
-// Fake Utils object để mô phỏng dữ liệu, cần thay thế bằng Utils thực tế nếu có
-const Utils = {
-  months: ({ count }: { count: number }) => {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    return months.slice(0, count);
-  },
-  numbers: ({ count, min, max }: { count: number; min: number; max: number }) =>
-    Array.from({ length: count }, () =>
-      Math.floor(Math.random() * (max - min + 1) + min)
-    ),
-  CHART_COLORS: {
-    red: "rgb(255, 99, 132)",
-    blue: "rgb(54, 162, 235)",
-  },
-  transparentize: (color: string, opacity: number) => {
-    const rgba = color.replace("rgb", "rgba").replace(")", `, ${opacity})`);
-    return rgba;
-  },
-};
-
-const DATA_COUNT = 7;
-const NUMBER_CFG = { count: DATA_COUNT, min: 0, max: 200 };
-
-const labels = Utils.months({ count: 7 });
-const data = {
-  labels: labels,
-  datasets: [
-    {
-      label: "Tasks",
-      data: Utils.numbers(NUMBER_CFG),
-      borderColor: Utils.CHART_COLORS.red,
-      backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
-    },
-    // {
-    //   label: "Dataset 2",
-    //   data: Utils.numbers(NUMBER_CFG),
-    //   borderColor: Utils.CHART_COLORS.blue,
-    //   backgroundColor: Utils.transparentize(Utils.CHART_COLORS.blue, 0.5),
-    // },
-  ],
-};
-
 const config = {
-  type: "line",
-  data: data,
-
   responsive: true,
 
   plugins: {
@@ -92,7 +34,7 @@ const config = {
       },
     },
     title: {
-      display: true,
+      display: false,
       text: "Task Frequency Over Time",
       font: {
         size: 24,
@@ -102,15 +44,38 @@ const config = {
   },
 };
 
-export default function LineChart() {
+type LineChartProps = {
+  tasksByMonthData: {
+    labels: string[]; // Danh sách tháng (hoặc ngày) từ tasksByMonthData
+    datasets: {
+      label: string;
+      data: number[];
+    }[];
+  };
+};
+
+export default function LineChart({ tasksByMonthData }: LineChartProps) {
+  const data = {
+    labels: tasksByMonthData.labels, // Labels từ tasksByMonthData
+    datasets: [
+      {
+        label: "Tasks Quantity", // Nhãn cho dataset
+        data: tasksByMonthData.datasets[0].data, // Dữ liệu số lượng task từ tasksByMonthData
+        borderColor: "rgb(255, 99, 132)", // Màu đường viền
+        backgroundColor: "rgba(255, 99, 132, 0.2)", // Màu nền với độ trong suốt
+      },
+    ],
+  };
+
   return (
-    <div className=" bg-white shadow p-7 rounded-lg mt-8">
-      <div
-        style={{ height: "500px", width: "100%" }}
-        className="flex justify-center"
-      >
-        <Line data={data} options={config} />
-      </div>
+    <div
+      style={{
+        height: "500px",
+        width: "100%",
+      }}
+      className="flex justify-center"
+    >
+      <Line data={data} options={config} />
     </div>
   );
 }

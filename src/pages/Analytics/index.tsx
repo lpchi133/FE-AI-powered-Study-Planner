@@ -5,13 +5,17 @@ import _ from "lodash";
 import moment from "moment";
 import React, { useMemo, useState } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
-import { Bar, Line, Pie } from "react-chartjs-2";
 import { useForm } from "react-hook-form";
 import useTasks from "../../hooks/useTasksContext";
-import { Task, TaskStatus } from "../../types/task";
+import { Task } from "../../types/task";
 import { formatTime } from "../../utils/helpers";
 import AIFeedBack from "./AIFeedBack";
 import "./index.css";
+import PieChart from "../../components/Charts/PieChart";
+import BarChart from "../../components/Charts/BarChart";
+import LineChart from "../../components/Charts/LineChart";
+import BarChart1 from "../../components/Charts/BarChart1";
+import BarChart2 from "../../components/Charts/BarChart2";
 
 export enum AnalyticsFilter {
   TODAY = "today",
@@ -112,22 +116,52 @@ const Analytics: React.FC = () => {
     );
   }, [filteredTasks]);
 
-  const overtimeTasksByMonth = useMemo(() => {
+  // const overtimeTasksByMonth = useMemo(() => {
+  //   return filteredTasks.reduce(
+  //     (acc, task) => {
+  //       const dueDate = moment(task.dueDateTime);
+  //       const month = dueDate.format("YYYY-MM");
+  //       if (!acc[month]) {
+  //         acc[month] = [];
+  //       }
+  //       if (task.itemStatus === TaskStatus.Overdue) {
+  //         acc[month].push(task);
+  //       }
+  //       return acc;
+  //     },
+  //     {} as Record<string, Task[]>
+  //   );
+  // }, [filteredTasks]);
+
+  const tasksByMonth = useMemo(() => {
     return filteredTasks.reduce(
       (acc, task) => {
-        const dueDate = moment(task.dueDateTime);
-        const month = dueDate.format("YYYY-MM");
-        if (!acc[month]) {
-          acc[month] = [];
+        const dueDate = moment(task.dueDateTime); // Chuyển dueDateTime thành đối tượng moment
+        const day = dueDate.format("YYYY-MM"); // Định dạng thành chuỗi ngày "YYYY-MM-DD"
+        if (!acc[day]) {
+          acc[day] = []; // Khởi tạo mảng nếu ngày chưa tồn tại trong acc
         }
-        if (task.itemStatus === TaskStatus.Overdue) {
-          acc[month].push(task);
-        }
-        return acc;
+        acc[day].push(task); // Thêm task vào ngày tương ứng
+        return acc; // Trả về accumulator
       },
-      {} as Record<string, Task[]>
+      {} as Record<string, Task[]> // Kiểu dữ liệu: key là ngày, value là mảng task
     );
   }, [filteredTasks]);
+
+  const tasksByMonthData = useMemo(() => {
+    return {
+      labels: Object.keys(tasksByMonth),
+      datasets: [
+        {
+          label: "Tasks quantity",
+          data: Object.keys(tasksByMonth).map(
+            (key) => tasksByMonth[key].length
+          ),
+        },
+      ],
+    };
+  }, [tasksByMonth]);
+
   const tasksByStatusData = useMemo(() => {
     return {
       labels: Object.keys(analyticsStatusData),
@@ -203,21 +237,21 @@ const Analytics: React.FC = () => {
     };
   }, [focusTimePerTask, taskMap]);
 
-  const overtimeTasksByMonthData = useMemo(() => {
-    const sortedKeys = Object.keys(overtimeTasksByMonth).sort((a, b) =>
-      moment(a).diff(moment(b))
-    );
+  // const overtimeTasksByMonthData = useMemo(() => {
+  //   const sortedKeys = Object.keys(overtimeTasksByMonth).sort((a, b) =>
+  //     moment(a).diff(moment(b))
+  //   );
 
-    return {
-      labels: sortedKeys,
-      datasets: [
-        {
-          label: "Overtime Tasks",
-          data: sortedKeys.map((key) => overtimeTasksByMonth[key].length),
-        },
-      ],
-    };
-  }, [overtimeTasksByMonth]);
+  //   return {
+  //     labels: sortedKeys,
+  //     datasets: [
+  //       {
+  //         label: "Overtime Tasks",
+  //         data: sortedKeys.map((key) => overtimeTasksByMonth[key].length),
+  //       },
+  //     ],
+  //   };
+  // }, [overtimeTasksByMonth]);
 
   const onSubmit = (data: { filter: AnalyticFilter }) => {
     setActiveFilterType(data.filter);
@@ -370,12 +404,8 @@ const Analytics: React.FC = () => {
           </div>
           <div className="bg-white p-6 shadow rounded-lg">
             <h2 className="text-lg font-bold text-gray-800">Tasks by Status</h2>
-            <div
-              style={{ height: "200px", width: "100%" }}
-              className="flex justify-center"
-            >
-              <Pie data={tasksByStatusData} />
-            </div>
+
+            <PieChart tasksByStatusData={tasksByStatusData} />
           </div>
           <div className="bg-white shadow p-6 rounded-lg">
             <h2 className="text-lg font-bold text-gray-800">
@@ -386,7 +416,7 @@ const Analytics: React.FC = () => {
                 style={{ height: "200px", width: "100%" }}
                 className="flex justify-center"
               >
-                <Bar data={tasksByPriorityData} />
+                <BarChart2 tasksByPriorityData={tasksByPriorityData} />
               </div>
             </div>
           </div>
@@ -399,7 +429,7 @@ const Analytics: React.FC = () => {
           Time Spent on Each Task by Day
         </h2>
         <div className="flex justify-center">
-          <Bar data={dailyTaskTimeSpentData} />
+          <BarChart1 dailyTaskTimeSpentData={dailyTaskTimeSpentData} />
         </div>
       </div>
 
@@ -408,7 +438,7 @@ const Analytics: React.FC = () => {
           User Focus Time per Task
         </h2>
         <div className="flex justify-center">
-          <Bar data={focusTimePerTaskData} />
+          <BarChart focusTimePerTaskData={focusTimePerTaskData} />
         </div>
       </div>
       <div className=" bg-white shadow p-7 rounded-lg mt-8">
@@ -416,7 +446,7 @@ const Analytics: React.FC = () => {
           Task Frequency Over Time
         </h2>
         <div className="flex justify-center">
-          <Line data={overtimeTasksByMonthData} />
+          <LineChart tasksByMonthData={tasksByMonthData} />
         </div>
       </div>
     </div>
