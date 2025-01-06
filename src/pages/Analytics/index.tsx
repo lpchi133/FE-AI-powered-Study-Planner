@@ -163,29 +163,29 @@ const Analytics: React.FC = () => {
   }, [tasksByMonth]);
 
   const tasksByStatusData = useMemo(() => {
+    const labels = Object.keys(analyticsStatusData);
+    const data = labels.map((key) => analyticsStatusData[key].length);
     return {
-      labels: Object.keys(analyticsStatusData),
+      labels: labels.length ? labels : ["No Data"],
       datasets: [
         {
           label: "Tasks quantity",
-          data: Object.keys(analyticsStatusData).map(
-            (key) => analyticsStatusData[key].length
-          ),
+          data: data.length ? data : [0],
         },
       ],
     };
   }, [analyticsStatusData]);
 
   const tasksByPriorityData = useMemo(() => {
-    const datsets = Object.keys(analyticsPriorityData).map((key) => {
+    const datasets = Object.keys(analyticsPriorityData).map((key) => {
       return {
         label: key,
         data: [analyticsPriorityData[key].length],
       };
     });
     return {
-      labels: ["Priority"],
-      datasets: datsets,
+      labels: datasets.length ? ["Priority"] : ["No Data"],
+      datasets: datasets.length ? datasets : [{ label: "No Data", data: [0] }],
     };
   }, [analyticsPriorityData]);
 
@@ -215,11 +215,14 @@ const Analytics: React.FC = () => {
       };
     });
     return {
-      labels: Object.keys(taskSpentTime.dailyTaskTimeSpent),
-      datasets: datasets,
+      labels: Object.keys(taskSpentTime.dailyTaskTimeSpent).length
+        ? Object.keys(taskSpentTime.dailyTaskTimeSpent)
+        : ["No Data"],
+      datasets: datasets.length
+        ? datasets
+        : [{ label: "No Data", data: [0], stack: "default" }],
     };
   }, [taskSpentTime.dailyTaskTimeSpent, taskMap]);
-  console.log("dailyTaskTimeSpentData", dailyTaskTimeSpentData);
 
   const focusTimePerTaskData = useMemo(() => {
     return {
@@ -408,14 +411,9 @@ const Analytics: React.FC = () => {
             <PieChart tasksByStatusData={tasksByStatusData} />
           </div>
           <div className="bg-white shadow p-6 rounded-lg">
-            <h2 className="text-lg font-bold text-gray-800">
-              Tasks by Priority
-            </h2>
+            <h2 className="chart-title text-lg font-bold text-gray-800">Tasks by Priority</h2>
             <div className="flex justify-center">
-              <div
-                style={{ height: "200px", width: "100%" }}
-                className="flex justify-center"
-              >
+              <div className="chart-container flex justify-center">
                 <BarChart2 tasksByPriorityData={tasksByPriorityData} />
               </div>
             </div>

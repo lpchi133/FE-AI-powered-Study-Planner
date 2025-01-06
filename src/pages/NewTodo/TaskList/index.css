@@ -84,6 +84,17 @@ thead .des-column {
   border-bottom-right-radius: 0px !important;
 }
 
+.table th {
+  padding: 10px 20px; /* Adjust the padding values as needed */
+}
+
+.sort-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px; /* Adjust the gap value as needed */
+  white-space: nowrap;
+}
+
 @media screen and (max-width: 768px) {
   .table-responsive {
     display: block !important;
