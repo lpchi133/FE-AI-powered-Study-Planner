@@ -6,7 +6,7 @@ export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false); // State để toggle menu
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -15,35 +15,37 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 w-full bg-blue-600 py-3 px-4 shadow-md z-50">
-      <div className="mx-auto flex justify-between items-center">
+      <div className="mx-auto flex flex-wrap justify-between items-center">
         {/* Logo */}
-        <div className="text-white font-bold text-lg overflow-hidden whitespace-nowrap text-ellipsis flex">
+        <div className="text-white font-bold text-lg overflow-hidden whitespace-nowrap text-ellipsis flex flex-col md:flex-row">
           <Link to="/" className="text-white-important">
             AI-powered Study Planner
           </Link>
 
           {/* Menu icon for mobile */}
-          <button
-            className="text-white md:hidden focus:outline-none ml-8"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          {user && (
+            <button
+              className="text-white md:hidden focus:outline-none ml-8"
+              onClick={() => setMenuOpen(!menuOpen)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={
-                  menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
-                }
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={
+                    menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
+                  }
+                />
+              </svg>
+            </button>
+          )}
         </div>
 
         {user && (
