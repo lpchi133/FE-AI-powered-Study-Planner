@@ -1,50 +1,163 @@
- # React + TypeScript + Vite  
-    
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# AI-Powered Study Planner
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project is an **AI-powered study planner** built with **React, TypeScript, and Vite**. It provides a minimal setup to get React working in Vite with HMR and ESLint rules.
 
+## Project Overview
 
-## Expanding the ESLint configuration
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+The AI-powered study planner helps users manage their study schedules efficiently. It includes features like task management, analytics, and user authentication.
 
-- Configure the top-level `parserOptions` property like this:
+## Features
+
+- **Task Management** – Create, update, and delete tasks.
+- **Task Scheduling** – Drag-and-drop tasks on a calendar to update their status.
+- **Pomodoro Timer** – Helps users stay focused with structured study sessions.
+- **AI-powered Feedback** – Uses **Gemini API** to optimize study schedules.
+- **Analytics** – Visualize task data with charts.
+- **Password Reset** – Secure password recovery via email reset links.
+- **Real-time Synchronization** – Uses **Ably WebSocket** for seamless task updates.
+- **Responsive Design** – Optimized for both desktop and mobile devices.
+
+---
+
+## Project Structure
+
+The project structure is organized as follows:
+
+```
+FE-AI-powered-Study-Planner/
+├── public/            # Static assets
+├── src/               # Source code
+│   ├── components/    # Reusable components
+|   ├── context/       # Manages global state using React Context API.
+│   ├── hooks/         # Custom hooks
+|   ├── modals/        # Contains modal components
+│   ├── pages/         # Page components
+|   ├── types/         # TypeScript type definitions.
+│   ├── utils/         # Utility functions
+│   ├── App.tsx        # Main App component
+│   ├── index.tsx      # Entry point
+│   └── ...            # Other files
+├── eslint.config.js       # ESLint configuration
+├── package.json       # Project dependencies and scripts
+├── tsconfig.json      # TypeScript configuration
+└── vite.config.ts     # Vite configuration
+```
+
+---
+
+## Technologies Used
+
+| Technology       | Purpose                                 |
+| ---------------- | --------------------------------------- |
+| **React**        | Frontend framework                      |
+| **TypeScript**   | Enhances JavaScript with static typing  |
+| **Vite**         | Fast build tool and development server  |
+| **Tailwind CSS** | Utility-first CSS framework for styling |
+| **Chart.js**     | Data visualization (charts and graphs)  |
+| **Axios**        | HTTP client for API calls               |
+| **Moment.js**    | Date and time manipulation              |
+| **Ably**         | Real-time WebSocket synchronization     |
+| **Gemini API**   | AI-powered feedback and optimization    |
+
+---
+
+## Installation
+
+To install and run the project locally, follow these steps:
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/lpchi133/FE-AI-powered-Study-Planner.git
+cd FE-AI-powered-Study-Planner
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+After running the server, the application will be available at [http://localhost:5173](http://localhost:5173).
+
+**Note:** The backend must be running for the features to work properly. The backend can be found at the following link: [Backend Repository](https://github.com/lpchi133/BE-AI-powered-Study-Planner)
+
+---
+
+## ESLint Configuration
+
+This project uses **ESLint** for code linting. Currently, two official plugins are available:
+
+- **@vitejs/plugin-react** – Uses Babel for Fast Refresh.
+- **@vitejs/plugin-react-swc** – Uses SWC for Fast Refresh.
+
+### Expanding ESLint Configuration
+
+For stricter linting in production, update `eslint.config.js`:
 
 ```js
 export default tseslint.config({
   languageOptions: {
-    // other options...
     parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
       tsconfigRootDir: import.meta.dirname,
     },
   },
-})
+});
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+To enforce React best practices, install `eslint-plugin-react`:
+
+```bash
+npm install eslint-plugin-react --save-dev
+```
+
+Then, update your ESLint config:
 
 ```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+import react from "eslint-plugin-react";
 
 export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
+  settings: {
+    react: { version: "18.3" },
   },
+  plugins: { react },
   rules: {
-    // other rules...
-    // Enable its recommended rules
     ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
+    ...react.configs["jsx-runtime"].rules,
   },
-})
+});
 ```
+
+---
+
+## Interfaces
+
+- Login page
+  ![login page](./docs/imgs/login.jpeg)
+
+- Homepage
+  ![Homepage](./docs/imgs/homepage.jpeg)
+
+- Add Task
+  ![Add Task Page](./docs/imgs/add_task.jpeg)
+
+- Calendar
+  ![Calendar page](./docs/imgs/calendar.jpeg)
+
+- AI Suggestion
+  ![AI Suggestion](./docs/imgs/AI-suggestion.jpeg)
+
+- Pomodoro Timer
+  ![Timer](./docs/imgs/timer.png)
+
+- Analytics
+  ![Analytics](./docs/imgs/analytics.jpeg)
