@@ -1,5 +1,16 @@
 # AI-Powered Study Planner
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [ESLint Configuration](#eslint-configuration)
+- [Interfaces](#interfaces)
+
 ## Overview
 
 This project is an **AI-powered study planner** built with **React, TypeScript, and Vite**. It provides a minimal setup to get React working in Vite with HMR and ESLint rules.
@@ -80,7 +91,17 @@ cd FE-AI-powered-Study-Planner
 npm install
 ```
 
-### 3. Start the development server
+### 3. **Set up environment variables:**
+
+Create a `.env` file and configure the following variables:
+
+```env
+VITE_ENDPOINT_URL=<LINK_BACKEND>
+GEMINI_API_KEY=<YOUR_GEMINI_API_KEY>
+VITE_ABLY_API_KEY=<YOUR_ABLY_API_KEY>
+```
+
+### 4. Start the development server
 
 ```bash
 npm run dev
